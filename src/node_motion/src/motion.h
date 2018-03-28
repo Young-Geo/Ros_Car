@@ -22,6 +22,7 @@
 typedef struct _motion_t
 {
     int fd;
+    int isStart;
 } motion_t;
 
 

@@ -7,10 +7,15 @@
 
 
 #include <ros/ros.h>
+#include "node_ladar.h"
 
 int main(int argc, const char **argv)
 {
     ros::init(argc, (char **)argv, "node_ladar");
+
+    ros::NodeHandle n;
+
+    node_ladar_main(n);
 
     return 0;
 }

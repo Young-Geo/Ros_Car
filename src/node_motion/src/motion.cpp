@@ -8,11 +8,13 @@ int     motion_init(motion_t *motion)
 
     xassert(motion);
 
-    xassert((fd = xserial_open(DERIVCE_NAME)) <= 0);
+    xassert((fd = xserial_open(DERIVCE_NAME)) > 0);
 
     xassert(xserial_init(fd, 115200, 8, 1, 'N', 0));
 
     motion->fd = fd;
+
+    motion->isStart = 1;
 
     return 0;
 }

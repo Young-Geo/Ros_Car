@@ -10,4 +10,10 @@ INCLUDEPATH += /opt/ros/kinetic/include
 TARGET = Node_Ladar
 
 SOURCES += \
-    src/main.cpp
+    src/main.cpp \
+    src/node_ladar.cpp \
+    src/ladar.cpp
+
+HEADERS += \
+    src/node_ladar.h \
+    src/ladar.h
