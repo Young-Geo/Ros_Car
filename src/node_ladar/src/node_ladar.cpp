@@ -13,11 +13,12 @@ int     node_ladar_main(ros::NodeHandle &n)
     ladar_t ladar;
 
     xassert(!ladar_init(&ladar));
+    ladar_start(&ladar);
 
 
     auto timer_callback = [=, &ladar](const ros::TimerEvent& event) -> void
     {
-
+        ladar_analytic_data(&ladar);
     };
 
     n.createTimer(ros::Duration(0.1), timer_callback);
@@ -28,5 +29,8 @@ int     node_ladar_main(ros::NodeHandle &n)
         ros::spinOnce();
         r.sleep();
     }
+
+    ladar_stop(&ladar);
+    ros::shutdown();
     return 0;
 }

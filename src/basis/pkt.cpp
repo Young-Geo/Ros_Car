@@ -1,4 +1,5 @@
 #include "pkt.h"
+#include "xchain.h"
 
 int pkt_check_sum(unsigned char * buf , int size , unsigned char checksum )
 {
@@ -28,6 +29,19 @@ unsigned char pkt_build_check_sum(unsigned char * buf , int size )
     sum ^= buf[i] ;
   }
   
+  return sum ;
+}
+
+unsigned short pkt_build_short_check_sum(unsigned char * buf , int size )
+{
+  int i ;
+  unsigned short sum = 0 ;
+
+  for ( i = 0 ; i < size ; i ++ )
+  {
+    sum ^= buf[i] ;
+  }
+
   return sum ;
 }
 
@@ -75,8 +89,109 @@ unsigned char *  pkt_match_head(unsigned char *buf, int len, unsigned char tag)
 	return NULL;
 }
 
+int pkt_match_short_tag ( xchain * data , unsigned short tag )
+{
+    static unsigned char buf [BUFFER_SIZE] ;
+    int size , i , match = 0 ;
+
+    //find the s
+    while (1)
+    {
+      //get data
+      size = xchain_size(data) ;
+      size = XXMIN(size, (int)sizeof(buf)) ;
+      if ( size <= 0 )
+      {
+        //data chain is empty
+        break ;
+      }
+
+      xchain_get(data, buf, size) ;
+
+      //get the START tag
+      for (i = 0; i < size; i+=2)
+      {
+        if ( *((unsigned short *)(buf+i)) == tag )
+        {
+          match = 1 ;
+          break ;
+        }
+      }
+
+      if ( match )
+      {
+        //got start tag
+        xchain_delete(data, i) ;
+        break ;
+      }
+
+      //can not find start tag
+      xchain_delete(data, size) ;
+    }
+
+    return match ;
+}
+
+int pkt_match_tag ( xchain * data , unsigned char tag )
+{
+  static unsigned char buf [BUFFER_SIZE] ;
+  int size , i , match = 0 ;
+
+  //find the s
+  while (1)
+  {
+    //get data
+    size = xchain_size(data) ;
+    size = XXMIN(size, (int)sizeof(buf)) ;
+    if ( size <= 0 )
+    {
+      //data chain is empty
+      break ;
+    }
+
+    xchain_get(data, buf, size) ;
+
+    //get the START tag
+    for ( i = 0 ; i < size ; i ++ )
+    {
+      if ( buf[i] == tag )
+      {
+        match = 1 ;
+        break ;
+      }
+    }
+
+    if ( match )
+    {
+      //got start tag
+      xchain_delete(data, i) ;
+      break ;
+    }
+
+    //can not find start tag
+    xchain_delete(data, size) ;
+  }
+
+  return match ;
+}
+
+unsigned char *  pkt_match_short_head(unsigned char *buf, int len, unsigned short tag)
+{
+    int i = 0;
+    if (!buf) {
+        return NULL;
+    }
+    for (i = 0; i < len; i+=2)
+    {
+        if (*buf == tag) {
+            return buf;
+        }
+        buf+=2;
+    }
 
 
+    return NULL;
+}
 
 
 
@@ -127,13 +242,13 @@ int	 pkt_parse_data(unsigned char *buf, int len, unsigned char **out_data, int *
 	tdata = data;
 	++data;
 	
-	IN8(data, xor_cc);//异或校验码
+	IN8(data, xor_cc);//脪矛禄貌脨拢脩茅脗毛
 	xzero((data - 1), sizeof(unsigned char));
 
 	IN8(data, v);
-	assert(v == PKT_YS_FRAME_TYPE);//类型
+	assert(v == PKT_YS_FRAME_TYPE);//脌脿脨脥
 
-	IN16_BE(data, v);//大小  数据大小 = v - 6;
+	IN16_BE(data, v);//麓贸脨隆  脢媒戮脻麓贸脨隆 = v - 6;
 
 	if (!pkt_check_sum(tdata, v, xor_cc)) {
 		xerror("match head pkt_check_sum error");
@@ -170,13 +285,13 @@ int	 pkt_parse_frame(unsigned char *buf, int len, unsigned char *out_data, int o
 	tdata = data;
 	++data;
 	
-	IN8(data, xor_cc);//异或校验码
+	IN8(data, xor_cc);//脪矛禄貌脨拢脩茅脗毛
 	xzero((data - 1), sizeof(unsigned char));
 
 	IN8(data, v);
-	assert(v == PKT_YS_FRAME_TYPE);//类型
+	assert(v == PKT_YS_FRAME_TYPE);//脌脿脨脥
 
-	IN16_BE(data, v);//大小  数据大小 = v - 6;
+	IN16_BE(data, v);//麓贸脨隆  脢媒戮脻麓贸脨隆 = v - 6;
 
 	if (!pkt_check_sum(tdata, v, xor_cc)) {
 		xerror("match head pkt_check_sum error");

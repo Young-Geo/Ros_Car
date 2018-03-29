@@ -3,6 +3,7 @@
 
 #include "afx.h"
 #include "xlog.h"
+#include "xchain.h"
 
 
 #define PKT_YS_START_TAG 0xA5
@@ -13,12 +14,15 @@
 
 
 
-
+int pkt_match_tag ( xchain * data , unsigned char tag );
+int pkt_match_short_tag ( xchain * data , unsigned short tag );
 unsigned char pkt_build_check_sum ( unsigned char * buf , int size);
+unsigned short pkt_build_short_check_sum(unsigned char * buf , int size );
 int pkt_check_sum ( unsigned char * buf , int size , unsigned char checksum );
 unsigned char *  pkt_build_byte_tag(unsigned char * buf, unsigned char tag);
 unsigned char *  pkt_build_short_tag(unsigned char * buf, unsigned short tag);
 unsigned char *  pkt_match_head(unsigned char *buf, int len, unsigned char tag);
+unsigned char *  pkt_match_short_head(unsigned char *buf, int len, unsigned short tag);
 int	 pkt_make_client(unsigned char *buf, int len, unsigned char **out_data, int *out_len);
 int	 pkt_parse_data(unsigned char *buf, int len, unsigned char **out_data, int *out_len);
 int	 pkt_parse_frame(unsigned char *buf, int len, unsigned char *out_data, int out_len);
