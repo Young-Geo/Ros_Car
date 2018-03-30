@@ -1,43 +1,5 @@
 #include "solution.h"
 
-/*
-JY901_t jy901;
-
-void CopeSerialData(char ucData[],unsigned short usLength)
-{
-    static unsigned char chrTemp[2000];
-    static unsigned char ucRxCnt = 0;
-    static unsigned short usRxLength = 0;
-
-
-    xmemcpy(chrTemp,ucData,usLength);
-    usRxLength += usLength;
-    while (usRxLength >= 11)
-    {
-        if (chrTemp[0] != 0x55)
-        {
-            usRxLength--;
-            memcpy(&chrTemp[0],&chrTemp[1],usRxLength);
-            continue;
-        }
-        switch(chrTemp[1])
-        {
-            case 0x50:	memcpy(&jy901.stcTime,&chrTemp[2],8);break;
-            case 0x51:	memcpy(&jy901.stcAcc,&chrTemp[2],8);break;
-            case 0x52:	memcpy(&jy901.stcGyro,&chrTemp[2],8);break;
-            case 0x53:	memcpy(&jy901.stcAngle,&chrTemp[2],8);break;
-            case 0x54:	memcpy(&jy901.stcMag,&chrTemp[2],8);break;
-            case 0x55:	memcpy(&jy901.stcDStatus,&chrTemp[2],8);break;
-            case 0x56:	memcpy(&jy901.stcPress,&chrTemp[2],8);break;
-            case 0x57:	memcpy(&jy901.stcLonLat,&chrTemp[2],8);break;
-            case 0x58:	memcpy(&jy901.stcGPSV,&chrTemp[2],8);break;
-        }
-        usRxLength -= 11;
-        memcpy(&chrTemp[0],&chrTemp[11],usRxLength);
-    }
-}
-*/
-
 int     serial_data(int fd, char *buf, int len)
 {
     int serFd = 0, ret = 0;
@@ -57,17 +19,48 @@ int     serial_data(int fd, char *buf, int len)
 }
 
 
-int     serial_par(JY901_t *jy901, int fd)
+int     serial_par(int fd, xchain *chain, xlist *list)
 {
     char buf[4096] = { 0 }, ret = 0, surplus = 0, i;
-    char temdata[11] = { 0 };
+    //char temdata[11] = { 0 };
+    JY901_t jy901;
 
-    xassert(jy901);
     xassert(fd > 0);
+    xassert(chain);
+    xassert(list);
 
     surplus = ret = serial_data(fd, buf, sizeof(buf));
+    xchain_add(chain, (void *)buf, ret);
 
-    for (i = 0; i < ret && surplus >= 11;)
+    while (xchain_size(chain) > IMUPACKSIZE)
+    {
+        //
+        if (!pkt_match_tag(chain, 0x55)) {
+            return -1;
+        }
+
+        xchain_get(chain, buf, IMUPACKSIZE);
+        xchain_delete(chain, IMUPACKSIZE);
+        // ying gai ji suan sum
+        xlist_add(list, NULL, XLIST_STRING, (char *)xmemdup((void *)buf, IMUPACKSIZE));
+
+        switch (buf[1])
+        {
+            case 0x50: xmemcpy(jy901.datatime, &buf[0], 11);break;
+            case 0x51: xmemcpy(jy901.acceleration, &buf[0], 11);break;
+            case 0x52: xmemcpy(jy901.angularvelocity, &buf[0], 11);break;
+            case 0x53: xmemcpy(jy901.angle, &buf[0], 11);break;
+            case 0x54: xmemcpy(jy901.magnetic, &buf[0], 11);break;
+            case 0x55: xmemcpy(jy901.portstatus, &buf[0], 11);break;
+            case 0x56: xmemcpy(jy901.pressureheight, &buf[0], 11);break;
+            case 0x57: xmemcpy(jy901.latitudelongitude, &buf[0], 11);break;
+            case 0x58: xmemcpy(jy901.groundspeed, &buf[0], 11);break;
+            //case 0x59: xmemcpy(jy901->fourelements, &buf[i], 11);break;
+        }
+    }
+
+    /*
+    for (i = 0; i < ret && surplus >= IMUPACKSIZE;)
     {
         if (buf[i] != 0x55) {
             ++i;
@@ -90,7 +83,8 @@ int     serial_par(JY901_t *jy901, int fd)
         }
 
         surplus -= 11;
-    }
-    jy901->isStart = 1;
+    }*/
+
+
     return 0;
 }

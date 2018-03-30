@@ -122,6 +122,7 @@ static int par_data(xchain *chain, xlist *datas)
     }
 
     xchain_get(chain, (void *)databuf, LADARPACKSIZE);
+    xchain_delete(chain, LADARPACKSIZE);
     start = databuf;
 
     check = *(start+8);
@@ -129,7 +130,6 @@ static int par_data(xchain *chain, xlist *datas)
     //check yan zheng
 
     if (pkt_build_short_check_sum(start, LADARPACKSIZE) != check) {
-        xchain_delete(chain, LADARPACKSIZE);
         xerror("check error");
         return -1;
     }
@@ -155,11 +155,9 @@ static int par_data(xchain *chain, xlist *datas)
     data.data = *start;
     start += 2;
 
-    xchain_delete(chain, LADARPACKSIZE);
-
-    data.data = ((data.data >> 1) >> 6);//data length jie suan / 64
-    data.start_position = (data.start_position >> 2);//   /4
-    data.end_position = (data.end_position >> 2);//  /4
+    data.data = (data.data >> 2);//data length jie suan / 4
+    data.start_position = ((data.start_position >> 1) >> 6);//   /64
+    data.end_position = ((data.end_position >> 1) >> 6);//  /4
 
     xlist_add(datas, NULL, XLIST_STRING, (char *)xmemdup(&data, sizeof(data)));
     return 0;
@@ -185,7 +183,7 @@ int     ladar_analytic_data(ladar_t *ladar)
 
     xchain_add(&ladar->chain, (void *)data, ret);
 
-    while (xchain_size(&ladar->chain) > 12)
+    while (xchain_size(&ladar->chain) > LADARPACKSIZE)
     {
         //
         if (-4 == par_data(&ladar->chain, ladar->datas)) {
