@@ -9,10 +9,13 @@
 #define __NODE_MOTION_H__
 
 #include <ros/ros.h>
+#include <tf/transform_broadcaster.h>
+#include <nav_msgs/Odometry.h>
+
+
 #include "motion.h"
 
 #include "../../devel/include/node_motion/motion.h"
-
 
 
 int     node_motion_main(ros::NodeHandle &n);
