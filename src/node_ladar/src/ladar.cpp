@@ -21,6 +21,7 @@ int     ladar_init(ladar_t *ladar)
 
     ladar->fd = fd;
     ladar->isStart = 0;
+    ladar->isSendStart = 0;
 
     xchain_init(&ladar->chain);
     xassert(ladar->datas = xlist_init());
@@ -47,31 +48,7 @@ int     ladar_start(ladar_t *ladar)
         return -1;
     }
 
-    if ((ret = xserial_recv(ladar->fd, data, sizeof(data), 1000)) <= 0) {
-        xerror("xserial_recv error");
-        return -1;
-    }
-
-    //par
-    if (NULL == (start = pkt_match_head((unsigned char *)data, ret, 0xA5))) {
-        xerror("pkt_match_head error");
-        return -1;
-    }
-
-    if (*(++start) != 0x5A) {
-        xerror("pkt_match_head error");
-        return -1;
-    }
-
-    start += 4;
-
-    if (((*start)&0xC0) != 0x1) {
-        xerror("pkt_match_head error");
-        return -1;
-    }
-
-    ladar->isStart = 1;
-    xmessage("start ladar\n");
+    ladar->isSendStart = 1;
 
     return 0;
 }
@@ -163,16 +140,39 @@ static int par_data(xchain *chain, xlist *datas)
     return 0;
 }
 
+int checkStart(xchain *chain)
+{
+    char buf[9] = { 0 };
+    xassert(chain);
+    //par
+    if (!pkt_match_short_tag(chain, 0xA55A)) {
+        xerror("checkStart pkt_match_short_tag not find 0xA55A");
+        return -1;
+    }
+
+    xchain_get(chain, (void *)buf, 7);
+    xchain_delete(chain, 7);
+
+
+    if ((buf[5]&0xC0) != 0x1) {
+        xerror("checkStart pkt_match_head 0x1");
+        return -1;
+    }
+
+    xmessage("start ladar\n");
+    return 0;
+}
+
 int     ladar_analytic_data(ladar_t *ladar)
 {
-    unsigned char data[BUFFER_SIZE] = { 0 }, *start = NULL;
+    unsigned char data[4096] = { 0 }, *start = NULL;
     int ret = 0;
 
     xassert(ladar);
     xassert(&ladar->chain);
 
-    if (!ladar->isStart || ladar->fd <= 0) {
-        xerror("ladar_analytic_data  isStart || fd error");
+    if (!ladar->isSendStart || ladar->fd <= 0) {
+        xerror("ladar_analytic_data  isSendStart || fd error");
         return -1;
     }
 
@@ -182,6 +182,11 @@ int     ladar_analytic_data(ladar_t *ladar)
     }
 
     xchain_add(&ladar->chain, (void *)data, ret);
+
+    if (ladar->isSendStart && !ladar->isStart) {
+        if (!checkStart(&ladar->chain)) ladar->isStart = 1;
+        else return -1;
+    }
 
     while (xchain_size(&ladar->chain) > LADARPACKSIZE)
     {

@@ -29,7 +29,7 @@ typedef struct _point_cloud_data_t
 typedef struct _ladar_t
 {
     int fd;
-    int isStart;
+    int isStart, isSendStart;
     xchain chain;
     xlist *datas;
 } ladar_t;
