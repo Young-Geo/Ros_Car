@@ -14,7 +14,7 @@
 #include "xchain.h"
 #include "xlist.h"
 
-#define DERIVCE_NAME "/dev/ttyUSB1"
+#define DERIVCE_NAME "/dev/ttyUSB0"
 #define LADARPACKSIZE 12
 
 typedef struct _point_cloud_data_t

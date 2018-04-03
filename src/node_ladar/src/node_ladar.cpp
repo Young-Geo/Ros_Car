@@ -11,9 +11,15 @@ int     node_ladar_main(ros::NodeHandle &n)
 {
     ros::Rate r(10);
     ladar_t ladar;
+    int i = 0;
 
     xassert(!ladar_init(&ladar));
-    ladar_start(&ladar);
+    for (i = 0; i < 100; ++i)
+    {
+        if (!ladar_start(&ladar))
+            break;
+        xmessage("continue start ladar\n");
+    }
 
 
     auto timer_callback = [=, &ladar](const ros::TimerEvent& event) -> void

@@ -1,5 +1,30 @@
-#include "solution.h"
+#include "imu.h"
 
+
+imu_t * imu_init()
+{
+    imu_t *imu = NULL;
+    int fd = 0;
+    xassert(imu = (imu_t *)xmalloc(sizeof(imu_t)));
+    xzero(imu, sizeof(imu_t));
+    //xassert((fd = xsk_init_client("192.168.0.103", 9001, 0)) > 0);
+    xassert((fd = xserial_open(DERIVCE_NAME)) > 0);
+    xassert(xserial_init(fd, 9600, 8, 1, 'N', 0));
+
+    imu->serial_fd = fd;
+    xchain_init(&imu->chain);
+    xassert((imu->lists = xlist_init()));
+    imu->isStart = 1;
+    return imu;
+}
+
+int  make_imu(imu_t *imu)
+{
+    xassert(imu);
+    //
+}
+
+/*
 int     serial_data(int fd, char *buf, int len)
 {
     int serFd = 0, ret = 0;
@@ -11,6 +36,21 @@ int     serial_data(int fd, char *buf, int len)
     }
 
     if ((ret = xsk_rcv(serFd, buf, len, 0, 0)) < 0) {
+        xerror("serial_data: xsk_rcv\n");
+        return -1;
+    }
+
+    return ret;
+}*/
+
+
+int     serial_data(int fd, char *buf, int len)
+{
+    int serFd = 0, ret = 0;
+    xassert((serFd = fd) > 0);
+
+
+    if ((ret = xserial_recv(serFd, buf, len, 0)) <= 0) {
         xerror("serial_data: xsk_rcv\n");
         return -1;
     }
@@ -43,6 +83,7 @@ int     serial_par(int fd, xchain *chain, xlist *list)
         xchain_delete(chain, IMUPACKSIZE);
         // ying gai ji suan sum
         xlist_add(list, NULL, XLIST_STRING, (char *)xmemdup((void *)buf, IMUPACKSIZE));
+        xmessage("tag %x\n", buf[1]);
 
         switch (buf[1])
         {

@@ -13,7 +13,7 @@
 #include "xlog.h"
 
 
-#define DERIVCE_NAME "/dev/ttyUSB0"
+#define DERIVCE_NAME "/dev/ttyUSB1"
 
 #define A 100
 #define B 120

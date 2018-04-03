@@ -1,5 +1,30 @@
 
 #include "xserial.h"
+#include <linux/serial.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <termios.h>
+#include <unistd.h>
+
+
+#define SNCCS 19
+
+
+struct termios2 {
+    tcflag_t c_iflag;       /* input mode flags */
+    tcflag_t c_oflag;       /* output mode flags */
+    tcflag_t c_cflag;       /* control mode flags */
+    tcflag_t c_lflag;       /* local mode flags */
+    cc_t c_line;            /* line discipline */
+    cc_t c_cc[SNCCS];          /* control characters */
+    speed_t c_ispeed;       /* input speed */
+    speed_t c_ospeed;       /* output speed */
+};
+
+#ifndef BOTHER
+#  define BOTHER      0010000
+#endif
+
 
 int xserial_open ( char * xserial_name )
 {
@@ -26,6 +51,51 @@ int xserial_open ( char * xserial_name )
   }
   xmessage("[serial] open [%s] ok!\n" , xserial_name ) ;
   return fd ;
+}
+int xserial_given_init(int fd, int baudrate, int databit , int stopbit , char parity , int flow_ctrl)
+{
+    struct termios2 tio2;
+    struct serial_struct serial;
+
+
+    if (::ioctl(fd, TCGETS2, &tio2) != -1) {
+        tio2.c_cflag &= ~CBAUD;
+        tio2.c_cflag |= BOTHER;
+
+        tio2.c_ispeed = baudrate;
+        tio2.c_ospeed = baudrate;
+
+        tcflush(fd,TCIFLUSH);
+
+        if (fcntl(fd, F_SETFL, FNDELAY)) {
+            return false;
+        }
+
+        if (::ioctl(fd, TCSETS2, &tio2) != -1 && ::ioctl(fd, TCGETS2, &tio2) != -1) {
+            return true;
+        }
+    }
+
+    if (ioctl(fd, TIOCGSERIAL, &serial) == -1) {
+        return false;
+    }
+
+    serial.flags &= ~ASYNC_SPD_MASK;
+    serial.flags |= (ASYNC_SPD_CUST /* | ASYNC_LOW_LATENCY*/);
+    serial.custom_divisor = serial.baud_base / baudrate;
+
+    if (serial.custom_divisor == 0) {
+        return false;
+    }
+
+    if (serial.custom_divisor * baudrate != serial.baud_base) {
+    }
+
+    if (::ioctl(fd, TIOCSSERIAL, &serial) == -1) {
+        return false;
+    }
+
+    return xserial_init(fd, 38400, databit, stopbit, parity, flow_ctrl);
 }
 int xserial_init ( int fd , int speed , int databit , int stopbit , char parity , int flow_ctrl )
 {

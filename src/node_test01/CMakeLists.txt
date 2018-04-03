@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(node_ladar)
+project(node_test01)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+# add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -49,9 +50,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+#   motion.msg
+#)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -68,10 +68,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+#generate_messages(
+#  DEPENDENCIES
+#  std_msgs
+#)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -104,8 +104,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS
-  LIBRARIES node_ladar
-  CATKIN_DEPENDS roscpp rospy std_msgs
+  LIBRARIES node_motion
+  CATKIN_DEPENDS roscpp rospy std_msgs tf
   DEPENDS system_lib
 )
 
@@ -123,7 +123,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/node_ladar.cpp
+#   src/${PROJECT_NAME}/node_motion.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -134,7 +134,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/node_ladar_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/node_motion_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -191,16 +191,16 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_node_ladar.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_node_motion.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
 SET(SOURCE_FILES 
-  src/ladar.cpp
-  src/node_ladar.cpp
+ src/node_test01.cpp
 ) 
 SET(BASIS 
  ../basis/afx.cpp 
@@ -217,6 +217,6 @@ SET(BASIS
 
 
 
-add_executable(node_ladar src/main.cpp ${BASIS} ${SOURCE_FILES})
-target_link_libraries(node_ladar ${catkin_LIBRARIES})
+add_executable(node_test01 src/main.cpp ${BASIS} ${SOURCE_FILES})
+target_link_libraries(node_test01 ${catkin_LIBRARIES})
 

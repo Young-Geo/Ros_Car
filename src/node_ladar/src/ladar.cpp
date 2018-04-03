@@ -17,7 +17,7 @@ int     ladar_init(ladar_t *ladar)
     xzero(ladar, sizeof(ladar_t));
     xassert((fd = xserial_open(DERIVCE_NAME)) > 0);
 
-    xassert(xserial_init(fd, 115200, 8, 1, 'N', 0));
+    xassert(xserial_given_init(fd, 128000, 8, 1, 'N', 0));
 
     ladar->fd = fd;
     ladar->isStart = 0;
@@ -71,7 +71,7 @@ int     ladar_start(ladar_t *ladar)
     }
 
     ladar->isStart = 1;
-
+    xmessage("start ladar\n");
 
     return 0;
 }

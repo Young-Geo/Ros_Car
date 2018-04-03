@@ -7,13 +7,11 @@ INCLUDEPATH += ../basis
 INCLUDEPATH += /opt/ros/kinetic/include
 
 
-TARGET = Node_IMU
+TARGET = Node_Motion
 
 SOURCES += \
     src/main.cpp \
-    src/node_imu.cpp \
-    src/imu.cpp
+    src/node_test01.cpp
 
 HEADERS += \
-    src/node_imu.h \
-    src/imu.h
+    src/node_test01.h

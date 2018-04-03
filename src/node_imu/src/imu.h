@@ -14,6 +14,7 @@
 #include "xchain.h"
 #include "xlist.h"
 #include "pkt.h"
+#include "xserial.h"
 
 #define IMUPACKSIZE 11
 
@@ -34,9 +35,24 @@ typedef struct _JY901_t
     //int isStart;
 } JY901_t;
 
-//void    CopeSerialData(char ucData[],unsigned short usLength);
 int     serial_par(int fd, xchain *chain, xlist *list);
 int     serial_data(int fd, char *buf, int len);
+
+
+#define DERIVCE_NAME "/dev/ttyUSB0"
+
+typedef struct _imu_t
+{
+    int serial_fd;
+    int isStart;
+    JY901_t jy901;
+    xchain chain;
+    xlist *lists;
+} imu_t;
+
+//void    CopeSerialData(char ucData[],unsigned short usLength);
+imu_t * imu_init();
+int     make_imu(imu_t *imu);
 
 
 
