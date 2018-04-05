@@ -41,18 +41,29 @@ int     serial_data(int fd, char *buf, int len);
 
 #define DERIVCE_IMU_NAME "/dev/imu"
 
+typedef struct _mpu_t
+{
+  int timestamp;//时间戳
+  struct {int x, y, z, t;} acceleration;
+  struct {int x, y, z, t;} angularspeed;
+  struct {int x, y, z, t;} angle;
+  struct {int x, y, z, t;} magnetic;
+} mpu_t __attribute__ ((packed));
+
 typedef struct _imu_t
 {
     int serial_fd;
     int isStart;
     xchain chain;
     xlist *lists;
-} imu_t;
+    mpu_t mpu;
+} imu_t __attribute__ ((packed));
 
 //void    CopeSerialData(char ucData[],unsigned short usLength);
 imu_t * imu_init();
 int     imu_data_processing(imu_t *imu);
 int     imu_destory(imu_t *imu);
+
 int     make_imu(imu_t *imu);
 
 

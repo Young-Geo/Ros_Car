@@ -19,7 +19,7 @@ typedef struct _timmer_t
     int sig;
 } timmer_t __attribute__ ((packed));
 
-timmer_t* timmer_init(call_back_timmer_t back, void *arg);
+timmer_t* timmer_init(call_back_timmer_t back, void *arg, int ms);
 int       timmer_spinOnce(timmer_t*);
 int       timmer_destory(timmer_t*);
 

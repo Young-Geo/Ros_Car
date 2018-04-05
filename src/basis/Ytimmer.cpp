@@ -14,9 +14,10 @@ void    call_back_timmer(int sig)
 }
 
 
-timmer_t* timmer_init(call_back_timmer_t back, void *arg)
+timmer_t* timmer_init(call_back_timmer_t back, void *arg, int ms)
 {
     timmer_t *timmer = NULL;
+    struct itimerval ms_gap ;
 
     xassert(timmer = (timmer_t *)xmalloc(sizeof(timmer_t)));
 
@@ -26,6 +27,12 @@ timmer_t* timmer_init(call_back_timmer_t back, void *arg)
     timmer->call_back = back;
 
     signal(SIGALRM,  call_back_timmer);
+
+    ms_gap.it_value.tv_sec = 1 ;//1秒之后开始启动定时器
+    ms_gap.it_value.tv_usec = 0 ;
+    ms_gap.it_interval.tv_sec = ms / 1000 ;//每间隔ms毫秒执行一次定时器
+    ms_gap.it_interval.tv_usec = (ms % 1000) * 1000 ;
+    setitimer(ITIMER_REAL, &ms_gap, NULL) ;//设定定时器
 
     return timmer;
 }

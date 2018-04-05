@@ -62,7 +62,7 @@ int     node_control_main(ros::NodeHandle &n)
 
     xassert((control_imu.control = control_init()));
     xassert((control_imu.imu = imu_init()));
-    xassert((control_imu.timmer = timmer_init(timmer_back, &control_imu)));
+    xassert((control_imu.timmer = timmer_init(timmer_back, &control_imu, 10)));
 
     odom_pub = n.advertise<nav_msgs::Odometry>("odom", 20);
     vel_sub = n.subscribe("cmd_vel", 20, vel_callback); //订阅/cmd_vel主题
