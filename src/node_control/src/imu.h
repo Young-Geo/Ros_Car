@@ -39,19 +39,20 @@ int     serial_par(int fd, xchain *chain, xlist *list);
 int     serial_data(int fd, char *buf, int len);
 
 
-#define DERIVCE_NAME "/dev/imu"
+#define DERIVCE_IMU_NAME "/dev/imu"
 
 typedef struct _imu_t
 {
     int serial_fd;
     int isStart;
-    JY901_t jy901;
     xchain chain;
     xlist *lists;
 } imu_t;
 
 //void    CopeSerialData(char ucData[],unsigned short usLength);
 imu_t * imu_init();
+int     imu_data_processing(imu_t *imu);
+int     imu_destory(imu_t *imu);
 int     make_imu(imu_t *imu);
 
 

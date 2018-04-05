@@ -10,6 +10,7 @@
 #include "afx.h"
 #include "xlog.h"
 #define DERIVCE_NAME "/dev/ttyUSB1"
+#include <ros/duration.h>
 
 int test01()
 {
@@ -22,6 +23,13 @@ int test01()
 }
 
 
+void    timer_callback(const ros::TimerEvent& event)
+{
+    printf("hello >>> \n");
+    ROS_INFO("anxan\n");
+}
+
+
 int     node_test02_main(ros::NodeHandle &n)
 {
 
@@ -29,22 +37,28 @@ int     node_test02_main(ros::NodeHandle &n)
      ros::Rate r(10);
      char buf[1024];
 
+     /*
      fd = test01();
      if (fd <= 0) {
          xerror("test01 error\n");
          return -1;
-     }
+     }*/
 
 
 
+    n.createTimer(ros::Duration(0.1), timer_callback);
+    ros::spin();
+    /*
     while (ros::ok())
     {
+
         if (xserial_recv(fd, buf, sizeof(buf), 0) <= 0) {
             xmessage("xserial_recv fail \n");
         } else
             xmessage("rec %s", buf);
         r.sleep();
-    }
+
+    }*/
 
     return 0;
 }

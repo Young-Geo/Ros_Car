@@ -35,6 +35,7 @@ typedef struct _ladar_t
 } ladar_t;
 
 int     ladar_init(ladar_t *ladar);
+int     ladar_destory(ladar_t *ladar);
 
 int     ladar_start(ladar_t *ladar);
 int     ladar_stop(ladar_t *ladar);

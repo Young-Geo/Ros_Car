@@ -36,7 +36,7 @@ int     node_ladar_main(ros::NodeHandle &n)
         r.sleep();
     }
 
-    ladar_stop(&ladar);
+    ladar_destory(&ladar);
     ros::shutdown();
     return 0;
 }

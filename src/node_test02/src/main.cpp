@@ -21,17 +21,12 @@ int main(int argc, const char **argv)
 
     ros::NodeHandle n;
 
-    //node_test02_main(n);
+    node_test02_main(n);
 
-
+    /*
     ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
-
-    /**
-     * ros::spin() will enter a loop, pumping callbacks.  With this version, all
-     * callbacks will be called from within this thread (the main one).  ros::spin()
-     * will exit when Ctrl-C is pressed, or the node is shutdown by the master.
-     */
     ros::spin();
+    */
 
     return 0;
 }

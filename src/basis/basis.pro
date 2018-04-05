@@ -15,7 +15,8 @@ HEADERS += \
     xserial.h \
     xsocket.h \
     global.h \
-    motion.h
+    motion.h \
+    Ytimmer.h
 
 SOURCES += \
     afx.cpp \
@@ -28,4 +29,5 @@ SOURCES += \
     xserial.cpp \
     xsocket.cpp \
     global.cpp \
-    motion.cpp
+    motion.cpp \
+    Ytimmer.cpp

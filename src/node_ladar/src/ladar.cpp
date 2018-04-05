@@ -29,6 +29,20 @@ int     ladar_init(ladar_t *ladar)
     return 0;
 }
 
+int     ladar_destory(ladar_t *ladar)
+{
+    xassert(ladar);
+
+
+    ladar_stop(ladar);
+    ladar->isStart = 0;
+    ladar->isSendStart = 0;
+    xserial_close(&ladar->fd);
+    xchain_clear(&ladar->chain);
+    xlist_clean(&ladar->datas);
+    return 0;
+}
+
 int     ladar_start(ladar_t *ladar)
 {
     unsigned char buf[2] = {0xA5, 0x60}, *start = NULL;
