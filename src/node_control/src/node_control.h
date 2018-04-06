@@ -18,11 +18,15 @@
 #include "imu.h"
 #include "Ytimmer.h"
 
+#include "imu/Navigation.h"
+
+
 typedef struct _control_imu_t
 {
    control_t *control;
    imu_t *imu;
    timmer_t *timmer;
+   NAV_T nav;
 } control_imu_t;
 
 

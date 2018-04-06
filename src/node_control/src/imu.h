@@ -44,10 +44,10 @@ int     serial_data(int fd, char *buf, int len);
 typedef struct _mpu_t
 {
   int timestamp;//时间戳
-  struct {int x, y, z, t;} acceleration;
-  struct {int x, y, z, t;} angularspeed;
-  struct {int x, y, z, t;} angle;
-  struct {int x, y, z, t;} magnetic;
+  struct {double x, y, z, t;} acceleration;
+  struct {double x, y, z, t;} angularspeed;
+  struct {double x, y, z, t;} angle;
+  struct {double x, y, z, t;} magnetic;
 } mpu_t __attribute__ ((packed));
 
 typedef struct _imu_t

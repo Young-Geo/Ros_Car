@@ -13,10 +13,11 @@
 #include "xlog.h"
 
 
-#define DERIVCE_CHASSIS_NAME "/dev/chassis"
 
-#define A 100
-#define B 120
+#define DERIVCE_CHASSIS_NAME "/dev/motion"
+
+#define A 160.5
+#define B 160
 
 
 typedef struct _control_t
@@ -31,11 +32,11 @@ int     control_destory(control_t *control);
 
 int     control_data_processing(control_t *control);
 
-int     move(control_t *control, int wheelone, int wheeltwo, int wheelthree, int wheelfour);
+int     move(control_t *control, double wheelone, double wheeltwo, double wheelthree, double wheelfour);
 
-int     movexyz(control_t *control, int x, int y, int z);
+int     movexyz(control_t *control, double x, double y, double z);
 
-int     make_move(int wheelone, int wheeltwo, int wheelthree, int wheelfour, char *out_buf, int len);
+int     make_move(double wheelone, double wheeltwo, double wheelthree, double wheelfour, char *out_buf, int len);
 
 int     stop_move(control_t *control);
 

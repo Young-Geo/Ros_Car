@@ -1,0 +1,135 @@
+#include "i2c.h"
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+int i2c_open ( char * path )
+{
+  int fd ;
+  char addr[2] ;
+  
+  fd = open(path, O_RDWR);
+  if ( fd < 0 )
+  {
+    printf("i2c: open [%s] failed! errno : %d\n" , path , errno) ;
+    return -1 ;
+  }
+  
+  //set i2c address
+  if( ioctl(fd, I2C_SLAVE, Address) < 0 )     //set i2c address
+  {
+    close (fd) ;
+    
+    printf("i2c: fail to set [%s] device slave address!\n", path);
+    return -1;
+  }
+  
+  i2c_write(fd,PWR_MGMT_1,0x08);    //CLKSEL=1,PLL with X axis Gyro
+  usleep(1000*100);
+  i2c_write(fd,PWR_MGMT_1,0x00);    //CLKSEL=1,PLL with X axis Gyro
+  i2c_write(fd,SMPLRT_DIV,0x09); //SAMPLE Rate = 100Hz
+  usleep(1000*100);
+  i2c_write(fd,CONFIG,0x01); //DLPF_CFG=3 , G&A BW = 44Hz
+  usleep(1000*100);
+  i2c_write(fd,ACCEL_CONFIG,0x08);// Range=4g
+  usleep(1000*100);
+  i2c_write(fd,GYRO_CONFIG,0x10);//1000deg/s
+  usleep(1000*100);
+  
+  i2c_write(fd,INT_EN_REG,0x00); //SAMPLE Rate = 100Hz
+  i2c_write(fd,USER_CTRL_REG,0x00); //SAMPLE Rate = 100Hz
+  i2c_write(fd,FIFO_EN_REG,0x00); //SAMPLE Rate = 100Hz
+  i2c_write(fd,INTBP_CFG_REG,0x80); //SAMPLE Rate = 100Hz*/
+  
+  if ( i2c_read(fd,WHO_AM_I,&addr[0],1) == -1 )
+  {
+    close(fd) ;
+    
+    printf("i2c: can not read addr!\n") ;
+    return -1 ;
+  }
+  if(addr[0] == who_am_i)
+  {
+    i2c_write(fd,PWR_MGMT_1,0x01); //CLKSEL=1,PLL with X axis Gyro
+    i2c_write(fd,PWR_MGMT_2,0x00); //CLKSEL=1,PLL with X axis Gyro
+    i2c_write(fd,SMPLRT_DIV,0x09); //SAMPLE Rate = 100Hz
+  }
+  else
+  {
+    close(fd) ;
+    
+    printf("i2c: read adress error [%x]\n",addr[0]);
+    return -1;
+  }
+  printf ("i2c open [%s] ok!\n" , path);
+  return fd ;
+}
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+int i2c_write(int fd, uint8 reg, uint8 val)
+{
+  int retries;
+  uint8 data[2];
+  
+  data[0] = reg;
+  data[1] = val;
+  for(retries = 5; retries; retries--)
+  {
+    if(write(fd, data, 2) == 2)
+    {
+      return 0;
+    }
+  }
+  return -1;
+}
+int i2c_read(int fd, uint8 reg, void * data, uint8 len)
+{
+  int retries;
+  
+  for(retries=5; retries; retries--)
+  {
+    if(write(fd, &reg, 1) == 1)
+    {
+      if(read(fd,data,len) == len)
+      {
+        return 0;
+      }
+    }
+  }
+  return -1;
+}
+////////////////////////////////////////////////////////////////////////////
+int mpu_read ( int fd , MPU_DATA * mpu )
+{
+  short v ;
+  if( i2c_read(fd, ACCEL_XOUT_H,&mpu ->buf[0], 14) == -1 )
+  {
+    return 0 ;
+  }
+  
+  mpu ->acc_x = v = (mpu ->buf[0]<<8) + mpu ->buf[1];
+  mpu ->acc_y = v = (mpu ->buf[2]<<8) + mpu ->buf[3];
+  mpu ->acc_z = v = (mpu ->buf[4]<<8) + mpu ->buf[5];
+  mpu ->temp  = v = (mpu ->buf[6]<<8) + mpu ->buf[7];
+  mpu ->gyro_x = v = (mpu ->buf[8]<<8) + mpu ->buf[9];
+  mpu ->gyro_y = v = (mpu ->buf[10]<<8) + mpu ->buf[11];
+  mpu ->gyro_z = v = (mpu ->buf[12]<<8) + mpu ->buf[13];
+  return 1 ;
+}
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////

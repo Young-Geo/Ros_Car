@@ -39,7 +39,7 @@ int     serial_par(int fd, xchain *chain, xlist *list);
 int     serial_data(int fd, char *buf, int len);
 
 
-#define DERIVCE_NAME "/dev/imu"
+#define DERIVCE_NAME "/dev/ttyUSB0"
 
 typedef struct _imu_t
 {
