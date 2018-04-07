@@ -23,10 +23,5 @@ int main(int argc, const char **argv)
 
     node_test02_main(n);
 
-    /*
-    ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
-    ros::spin();
-    */
-
     return 0;
 }

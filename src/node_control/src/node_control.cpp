@@ -77,18 +77,10 @@ void vel_callback(const geometry_msgs::Twist::ConstPtr & input)//订阅/cmd_vel�
         angular_z  = 100;
         */
     if (linear_x == 0.0 && linear_y == 0.0 && angular_z == 0.0) {
-        char buf[1024] = { 0 };//= {0x4B, 0x52, 0x32, 0x32, 0xE7, 0xE7, 0x0D, 0x0A};
-        buf[0] = 0x4b;
-        buf[1] = 0x52;
-        buf[2] = 0x32;
-        buf[3] = 0x32;
-        buf[4] = 0xE7;
-        buf[5] = 0xE7;
-        buf[6] = 0x0D;
-        buf[7] = 0x0a;
+        char buf[1024] = { 0 };
+        sprintf(buf, "KR-F50,F50,F50,F50;");
         xmessage("shou dong \n");
-        //move(control_imu.control, 100.0, 100.0, 100.0, 100.0);
-        xserial_send(control_imu.control->fd, buf, 8);
+        xserial_send(control_imu.control->fd, buf, strlen(buf) + 1);
         return ;
     }
 
@@ -117,7 +109,7 @@ int     node_control_main(ros::NodeHandle &n)
     odom_pub = n.advertise<nav_msgs::Odometry>("odom", 20);
     vel_sub = n.subscribe("cmd_vel", 20, vel_callback); //订阅/cmd_vel主题
 
-
+/*
     auto atimer_callback = [=, &control_imu](const ros::TimerEvent& event) -> void
     {
 
@@ -134,8 +126,9 @@ int     node_control_main(ros::NodeHandle &n)
         xmessage("imu:magnetic:x %lf, y %lf, z %lf, t %lf\n", control_imu.imu->mpu.magnetic.x, control_imu.imu->mpu.magnetic.y, control_imu.imu->mpu.magnetic.z, control_imu.imu->mpu.magnetic.t);
 
     };
+    */
 
-    //ros::Timer timer = n.createTimer(ros::Duration(0.1), atimer_callback);
+    //ros::Timer timer = n.createTimer(ros::Duration(5), atimer_callback);
 
 
     signal(SIGINT, Stop);
