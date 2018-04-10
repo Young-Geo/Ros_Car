@@ -32,9 +32,22 @@ int     control_destory(control_t *control)
 
 int     control_data_processing(control_t *control)
 {
+    unsigned char buf[1024] = { 0 };
+    int i = 0, count = 0;
     xassert(control);
 
     //////
+
+    if ((count = xserial_recv(control->fd, (char *)buf, sizeof(buf), 0)) <= 0) {
+        xmessage("control not data\n");
+        return -1;
+    }
+    xmessage("rec %d buf %s\nhex:", count, (char *)buf);
+    for (i = 0; i < count; ++i)
+    {
+        printf("%d\t", buf[i]);
+    }
+    xmessage("\n");
     return 0;
 }
 
@@ -80,6 +93,7 @@ int     movexyz(control_t *control, double x, double y, double z)
 int     move(control_t *control, double wheelone, double wheeltwo, double wheelthree, double wheelfour)
 {
     char buf[1024] = { 0 };
+    int ret = 0;
     xassert(control);
 
     if (control->fd <= 0) {
@@ -92,8 +106,8 @@ int     move(control_t *control, double wheelone, double wheeltwo, double wheelt
         return -1;
     }
 
-    if (xserial_send(control->fd, buf, strlen(buf))) {
-        xmessage("send ok control %s\n", buf);
+    if ((ret = xserial_send(control->fd, buf, strlen(buf) + 1))) {
+        xmessage("send ok control %s  size = %d\n", buf, ret);
         return 0;
     }
     else
@@ -152,3 +166,59 @@ int     make_move(double wheelone, double wheeltwo, double wheelthree, double wh
     strcpy(out_buf, buf);
     return 0;
 }
+
+
+/*
+int     make_move(double wheelone, double wheeltwo, double wheelthree, double wheelfour, char *out_buf, int *len)
+{
+    char buf[512] = { 0 }, temp[124] = { 0 }, data;
+
+    xassert(out_buf);
+    xassert(len > 0);
+
+    xmemcpy(buf, "KR-", 3);
+
+    if (wheelone > 0)
+        xmemcpy(buf, "F", 1);
+    else
+        xmemcpy(buf, "B", 1);
+    data = (char)fabs(wheelone);
+    xmemcpy(buf, &data, sizeof(char));
+    xmemcpy(buf, ",", sizeof(char));
+
+    if (wheeltwo > 0)
+        xmemcpy(buf, "F", 1);
+    else
+        xmemcpy(buf, "B", 1);
+
+    data = (char)fabs(wheeltwo);
+    xmessage("data %d", data);
+    xmemcpy(buf, &data, sizeof(char));
+    xmemcpy(buf, ",", sizeof(char));
+
+    if (wheelthree > 0)
+        xmemcpy(buf, "F", 1);
+    else
+        xmemcpy(buf, "B", 1);
+
+    data = (char)fabs(wheelthree);
+    xmemcpy(buf, &data, sizeof(char));
+    xmemcpy(buf, ",", sizeof(char));
+
+    if (wheelfour > 0)
+        xmemcpy(buf, "F", 1);
+    else
+        xmemcpy(buf, "B", 1);
+
+    data = (char)fabs(wheelfour);
+    xmemcpy(buf, &data, sizeof(char));
+    xmemcpy(buf, ";", sizeof(char));
+
+    if (15 > *len) {
+        xerror("in buf  small\n");
+        return -1;
+    }
+    *len = 15;
+
+    return 0;
+}*/

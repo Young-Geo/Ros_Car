@@ -77,10 +77,22 @@ void vel_callback(const geometry_msgs::Twist::ConstPtr & input)//订阅/cmd_vel�
         angular_z  = 100;
         */
     if (linear_x == 0.0 && linear_y == 0.0 && angular_z == 0.0) {
-        char buf[1024] = { 0 };
-        sprintf(buf, "KR-F50,F50,F50,F50;");
+       char buf[1024] = { 0 };
+        buf[0] = 0x4B;
+        buf[1] = 0x52;
+        buf[2] = 50;
+        buf[3] = 50;
+        buf[4] = 50;
+        buf[5] = 50;
+        buf[6] = 0x0D;
+        buf[7] = 0x0A;
         xmessage("shou dong \n");
-        xserial_send(control_imu.control->fd, buf, strlen(buf) + 1);
+        for (int i = 0; i < 8; ++i)
+        {
+           printf("d %d, hex %x\t", buf[i], buf[i]);
+        }
+        printf("\n");
+        xserial_send(control_imu.control->fd, (char *)buf, 8);
         return ;
     }
 
@@ -109,9 +121,10 @@ int     node_control_main(ros::NodeHandle &n)
     odom_pub = n.advertise<nav_msgs::Odometry>("odom", 20);
     vel_sub = n.subscribe("cmd_vel", 20, vel_callback); //订阅/cmd_vel主题
 
-/*
     auto atimer_callback = [=, &control_imu](const ros::TimerEvent& event) -> void
     {
+
+        /*
 
         if (!control_imu.imu->isStart) {
             xdebug("imu not start");
@@ -124,11 +137,18 @@ int     node_control_main(ros::NodeHandle &n)
         xmessage("imu:angularspeed:x %lf, y %lf, z %lf, t %lf\n", control_imu.imu->mpu.angularspeed.x, control_imu.imu->mpu.angularspeed.y, control_imu.imu->mpu.angularspeed.z, control_imu.imu->mpu.angularspeed.t);
         xmessage("imu:angle:x %lf, y %lf, z %lf, t %lf\n", control_imu.imu->mpu.angle.x, control_imu.imu->mpu.angle.y, control_imu.imu->mpu.angle.z, control_imu.imu->mpu.angle.t);
         xmessage("imu:magnetic:x %lf, y %lf, z %lf, t %lf\n", control_imu.imu->mpu.magnetic.x, control_imu.imu->mpu.magnetic.y, control_imu.imu->mpu.magnetic.z, control_imu.imu->mpu.magnetic.t);
+*/
 
+        if (!control_imu.control->isStart) {
+            xdebug("control not start");
+            return;
+        }
+
+        control_data_processing(control_imu.control);
     };
-    */
 
-    //ros::Timer timer = n.createTimer(ros::Duration(5), atimer_callback);
+
+    ros::Timer timer = n.createTimer(ros::Duration(5), atimer_callback);
 
 
     signal(SIGINT, Stop);
