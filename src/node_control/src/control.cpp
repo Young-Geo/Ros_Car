@@ -45,7 +45,7 @@ int     control_data_processing(control_t *control)
     xmessage("rec %d buf %s\nhex:", count, (char *)buf);
     for (i = 0; i < count; ++i)
     {
-        printf("%d\t", buf[i]);
+        printf("%x %d ==\t", 0xff & buf[i], buf[i]);
     }
     xmessage("\n");
     return 0;
@@ -53,44 +53,42 @@ int     control_data_processing(control_t *control)
 
 int     movexyz(control_t *control, double x, double y, double z)
 {
-    double one, two, three, four;
+    int one, two, three, four;
 
     xassert(control);
 
-    one = y - x + (z*A + z*B);
-    two = y + x - (z*A + z*B);
-    three = y - x - (z*A + z*B);
-    four = y + x + (z*A + z*B);
+    one = (int)(y - x + (z*A + z*B));
+    two = (int)(y + x - (z*A + z*B));
+    three = (int)(y - x - (z*A + z*B));
+    four = (int)(y + x + (z*A + z*B));
 
-    if (one > 100.0)
+    if (one > 100)
         one = 100;
-    if (one < -100.0)
-        one = -100.0;
+    if (one < -100)
+        one = -100;
 
-    if (two > 100.0)
-        two = 100.0;
-    if (two < -100.0)
-        two = -100.0;
+    if (two > 100)
+        two = 100;
+    if (two < -100)
+        two = -100;
 
-    if (three > 100.0)
-        three = 100.0;
-    if (three < -100.0)
-        three = -100.0;
+    if (three > 100)
+        three = 100;
+    if (three < -100)
+        three = -100;
 
-    if (four > 100.0)
-        four = 100.0;
-    if (four < -100.0)
-        four = -100.0;
+    if (four > 100)
+        four = 100;
+    if (four < -100)
+        four = -100;
 
-
-    xmessage("owe %lf, two %lf, three %lf, four %lf\n", one, two, three, four);
 
     return move(control, one, two, three, four);
-    //return 0;
+
 }
 
 //
-int     move(control_t *control, double wheelone, double wheeltwo, double wheelthree, double wheelfour)
+int     move(control_t *control, int wheelone, int wheeltwo, int wheelthree, int wheelfour)
 {
     char buf[1024] = { 0 };
     int ret = 0;
@@ -101,12 +99,14 @@ int     move(control_t *control, double wheelone, double wheeltwo, double wheelt
         return -1;
     }
 
-    if (make_move(wheelone, wheeltwo, wheelthree, wheelfour, buf, sizeof(buf))) {
+    if ((ret = make_move(wheelone, wheeltwo, wheelthree, wheelfour, buf, sizeof(buf))) <= 0) {
         xerror("move: make move ");
         return -1;
     }
 
-    if ((ret = xserial_send(control->fd, buf, strlen(buf) + 1))) {
+    xmessage("one %d, two %d, three %d, four %d\n", wheelone, wheeltwo, wheelthree, wheelfour);
+
+    if ((ret = xserial_send(control->fd, buf, ret)) > 0) {
         xmessage("send ok control %s  size = %d\n", buf, ret);
         return 0;
     }
@@ -118,10 +118,12 @@ int     stop_move(control_t *control)
 {
     xassert(control);
 
-    return move(control, 0.0, 0.0, 0.0, 0.0);
+    return move(control, 0, 0, 0, 0);
 }
 
-int     make_move(double wheelone, double wheeltwo, double wheelthree, double wheelfour, char *out_buf, int len)
+
+/*
+int     make_move(int wheelone, int wheeltwo, int wheelthree, int wheelfour, char *out_buf, int len)
 {
     char buf[512] = { 0 }, temp[124] = { 0 };
 
@@ -134,28 +136,28 @@ int     make_move(double wheelone, double wheeltwo, double wheelthree, double wh
         xstrcat(buf, "F");
     else
         xstrcat(buf, "B");
-    xsprintf(temp, "%d,", (int)fabs(wheelone));
+    xsprintf(temp, "%d,", wheelone);
     xstrcat(buf, temp);
 
     if (wheeltwo > 0)
         xstrcat(buf, "F");
     else
         xstrcat(buf, "B");
-    xsprintf(temp, "%d,", (int)fabs(wheeltwo));
+    xsprintf(temp, "%d,", wheeltwo);
     xstrcat(buf, temp);
 
     if (wheelthree > 0)
         xstrcat(buf, "F");
     else
         xstrcat(buf, "B");
-    xsprintf(temp, "%d,", (int)fabs(wheelthree));
+    xsprintf(temp, "%d,", wheelthree);
     xstrcat(buf, temp);
 
     if (wheelfour > 0)
         xstrcat(buf, "F");
     else
         xstrcat(buf, "B");
-    xsprintf(temp, "%d;", (int)fabs(wheelfour));
+    xsprintf(temp, "%d;", wheelfour);
     xstrcat(buf, temp);
 
     if (xstrlen(buf) >= len) {
@@ -164,61 +166,29 @@ int     make_move(double wheelone, double wheeltwo, double wheelthree, double wh
     }
 
     strcpy(out_buf, buf);
-    return 0;
-}
+    return xstrlen(buf) + 1;
+}*/
 
 
-/*
-int     make_move(double wheelone, double wheeltwo, double wheelthree, double wheelfour, char *out_buf, int *len)
+
+int     make_move(int wheelone, int wheeltwo, int wheelthree, int wheelfour, char *out_buf, int len)
 {
-    char buf[512] = { 0 }, temp[124] = { 0 }, data;
+    unsigned char buf[512] = { 0 };
 
     xassert(out_buf);
-    xassert(len > 0);
+    xassert(len > 8);
 
-    xmemcpy(buf, "KR-", 3);
+    buf[0] = 0xA5;
+    buf[1] = 0x5A;
 
-    if (wheelone > 0)
-        xmemcpy(buf, "F", 1);
-    else
-        xmemcpy(buf, "B", 1);
-    data = (char)fabs(wheelone);
-    xmemcpy(buf, &data, sizeof(char));
-    xmemcpy(buf, ",", sizeof(char));
+    buf[2] = wheelone;
+    buf[3] = wheeltwo;
+    buf[4] = wheelthree;
+    buf[5] = wheelfour;
 
-    if (wheeltwo > 0)
-        xmemcpy(buf, "F", 1);
-    else
-        xmemcpy(buf, "B", 1);
+    buf[6] = 0xD5;
+    buf[7] = 0x5D;
 
-    data = (char)fabs(wheeltwo);
-    xmessage("data %d", data);
-    xmemcpy(buf, &data, sizeof(char));
-    xmemcpy(buf, ",", sizeof(char));
-
-    if (wheelthree > 0)
-        xmemcpy(buf, "F", 1);
-    else
-        xmemcpy(buf, "B", 1);
-
-    data = (char)fabs(wheelthree);
-    xmemcpy(buf, &data, sizeof(char));
-    xmemcpy(buf, ",", sizeof(char));
-
-    if (wheelfour > 0)
-        xmemcpy(buf, "F", 1);
-    else
-        xmemcpy(buf, "B", 1);
-
-    data = (char)fabs(wheelfour);
-    xmemcpy(buf, &data, sizeof(char));
-    xmemcpy(buf, ";", sizeof(char));
-
-    if (15 > *len) {
-        xerror("in buf  small\n");
-        return -1;
-    }
-    *len = 15;
-
-    return 0;
-}*/
+    xmemcpy(out_buf, (char *)buf, 8);
+    return 8;
+}

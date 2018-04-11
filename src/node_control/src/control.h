@@ -32,11 +32,11 @@ int     control_destory(control_t *control);
 
 int     control_data_processing(control_t *control);
 
-int     move(control_t *control, double wheelone, double wheeltwo, double wheelthree, double wheelfour);
+int     move(control_t *control, int wheelone, int wheeltwo, int wheelthree, int wheelfour);
 
 int     movexyz(control_t *control, double x, double y, double z);
 
-int     make_move(double wheelone, double wheeltwo, double wheelthree, double wheelfour, char *out_buf, int len);
+int     make_move(int wheelone, int wheeltwo, int wheelthree, int wheelfour, char *out_buf, int len);
 
 int     stop_move(control_t *control);
 
