@@ -140,7 +140,7 @@ int     serial_par(int fd, xchain *chain, xlist *list)
     {
         //
         if (!pkt_match_tag(chain, 0x55)) {
-            return -1;
+            continue;
         }
 
         xchain_get(chain, buf, IMUPACKSIZE);

@@ -115,7 +115,7 @@ int     node_control_main(ros::NodeHandle &n)
     ros::Rate r(1.0);
 
     xassert((control_imu.control = control_init()));
-    //xassert((control_imu.imu = imu_init()));
+    xassert((control_imu.imu = imu_init()));
     //NavInit(&control_imu.nav);
 
     odom_pub = n.advertise<nav_msgs::Odometry>("odom", 20);

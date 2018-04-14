@@ -1,6 +1,4 @@
 #include "control.h"
-#include "afx.h"
-#include "xlog.h"
 
 control_t *     control_init()
 {
@@ -12,6 +10,11 @@ control_t *     control_init()
     xassert((fd = xserial_open(DERIVCE_CHASSIS_NAME)) > 0);
 
     xassert(xserial_init(fd, 9600, 8, 1, 'N', 0));
+
+    xassert((control->list = xlist_init()));
+
+    xchain_init(&control->chain);
+
 
     control->fd = fd;
 
@@ -28,6 +31,36 @@ int     control_destory(control_t *control)
     control->isStart = 0;
     if (control->fd > 0)
         xserial_close(&control->fd);
+
+    xlist_clean(&control->list);
+    xchain_clear(&control->chain);
+}
+
+
+int     make_distence(xchain *chain, xlist *list)
+{
+    unsigned char buf[8] = { 0 };
+    int one = 0, two = 0, three = 0, four = 0;
+
+    xassert(chain);
+    xassert(list);
+
+    while (xchain_size(chain) > 8)
+    {
+        //par
+        if (!pkt_match_tag(chain, 0xD5))
+            continue;
+
+        xchain_get(chain, (void *)buf, 8);
+        if (!(0xD5 == buf[0] && 0X5D ==buf[1] && 0xA5 == buf[6] && 0x5A == buf[7]))
+            continue;
+
+        one = buf[2];
+        two = buf[3];
+        three = buf[4];
+        four = buf[5];
+    }
+    return 0;
 }
 
 int     control_data_processing(control_t *control)
@@ -48,6 +81,10 @@ int     control_data_processing(control_t *control)
         printf("%x %d ==\t", 0xff & buf[i], buf[i]);
     }
     xmessage("\n");
+
+    xchain_add(&control->chain, (void *)buf, count);
+    make_distence(&control->chain, control->list);
+
     return 0;
 }
 

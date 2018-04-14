@@ -11,19 +11,26 @@
 #include "afx.h"
 #include "xserial.h"
 #include "xlog.h"
+#include "pkt.h"
+#include "xlist.h"
+#include "xchain.h"
 
 
 
 #define DERIVCE_CHASSIS_NAME "/dev/motion"
 
-#define A 160.5
-#define B 160
+#define A 165 //16.5cm
+#define B 160 //16cm
+#define PI			3.1415926535897932384626433832795
+#define diameter 60
 
 
 typedef struct _control_t
 {
     int fd;
     int isStart;
+    xchain chain;
+    xlist *list;
 } control_t;
 
 
