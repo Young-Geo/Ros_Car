@@ -92,6 +92,10 @@ int  make_imu(imu_t *imu)
             break;
         }
     }
+
+
+    tmpu->timestamp = xgetminsecond();
+
 }
 
 

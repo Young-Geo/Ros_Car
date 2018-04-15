@@ -15,6 +15,7 @@
 #include "xlist.h"
 #include "pkt.h"
 #include "xserial.h"
+#include "xtime.h"
 
 #define IMUPACKSIZE 11
 

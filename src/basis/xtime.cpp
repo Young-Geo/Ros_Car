@@ -32,7 +32,7 @@ int xgetminsecond ()
   
   gettimeofday(&timev, NULL) ;
   timev.tv_sec %= 24 * 3600 ;//24小时重置一次时间戳
-  return (int)((timev.tv_sec * 1000) + (timev.tv_usec / 1000)) ;
+  return (int)((timev.tv_sec * 1000) + (timev.tv_usec / 1000));//毫秒
 }
 int xgetimestr ( char time_str[BUFFER_SIZE] , int exact , int nice )
 {
