@@ -20,7 +20,8 @@ SOURCES += \
     src/imu/Navigation.cpp \
     src/imu/Quaternion.cpp \
     src/imu/svdcmp.cpp \
-    src/imu/Vector.cpp
+    src/imu/Vector.cpp \
+    src/pose.cpp
 
 HEADERS += \
     src/node_control.h \
@@ -32,4 +33,5 @@ HEADERS += \
     src/imu/Navigation.h \
     src/imu/Quaternion.h \
     src/imu/svdcmp.h \
-    src/imu/Vector.h
+    src/imu/Vector.h \
+    src/pose.h

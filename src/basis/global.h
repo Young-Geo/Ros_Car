@@ -21,6 +21,14 @@ typedef struct _global_t
 //par
 ////
 
+#define A 165 //16.5cm
+#define B 160 //16cm
+#define PI			3.1415926535897932384626433832795
+#define DIAMETER 60 //60mm
+#define MOTIONTIMER 20 //20ms
+#define MECANUMPERIMETER (DIAMETER * PI) //麦克纳姆轮周长
+#define MAICHONGNUM 22
+
 ////
 
 extern global_t global;

@@ -14,15 +14,14 @@
 #include "pkt.h"
 #include "xlist.h"
 #include "xchain.h"
+#include "pose.h"
 
 
 
 #define DERIVCE_CHASSIS_NAME "/dev/motion"
 
-#define A 165 //16.5cm
-#define B 160 //16cm
-#define PI			3.1415926535897932384626433832795
-#define diameter 60
+#define MOTION2SHANGPACK 12
+#define SHANG2MOTIONPACK 8
 
 
 typedef struct _control_t
@@ -31,6 +30,7 @@ typedef struct _control_t
     int isStart;
     xchain chain;
     xlist *list;
+    pose_t pose;
 } control_t;
 
 

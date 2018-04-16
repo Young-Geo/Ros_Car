@@ -39,26 +39,40 @@ int     control_destory(control_t *control)
 
 int     make_distence(xchain *chain, xlist *list)
 {
-    unsigned char buf[8] = { 0 };
+    unsigned char buf[MOTION2SHANGPACK] = { 0 };
     int one = 0, two = 0, three = 0, four = 0;
+    int onef = 0, twof = 0, threef = 0, fourf = 0;
+    int tbuf[4] = { 0 };
 
     xassert(chain);
     xassert(list);
 
-    while (xchain_size(chain) > 8)
+    while (xchain_size(chain) > MOTION2SHANGPACK)
     {
         //par
         if (!pkt_match_tag(chain, 0xD5))
             continue;
 
-        xchain_get(chain, (void *)buf, 8);
-        if (!(0xD5 == buf[0] && 0X5D ==buf[1] && 0xA5 == buf[6] && 0x5A == buf[7]))
+        xchain_get(chain, (void *)buf, MOTION2SHANGPACK);
+        if (!(0xD5 == buf[0] && 0X5D ==buf[1] && 0xA5 == buf[10] && 0x5A == buf[11]))
             continue;
 
         one = buf[2];
         two = buf[3];
         three = buf[4];
         four = buf[5];
+
+        onef = buf[6];
+        twof = buf[7];
+        threef = buf[8];
+        fourf = buf[9];
+
+        tbuf[0] = one * onef;
+        tbuf[1] = two * twof;
+        tbuf[2] = three * threef;
+        tbuf[3] = four * fourf;
+
+        xlist_add(list, NULL, XLIST_STRING, (char *)xmemdup((void *)tbuf, sizeof(tbuf)));
     }
     return 0;
 }
@@ -84,6 +98,7 @@ int     control_data_processing(control_t *control)
 
     xchain_add(&control->chain, (void *)buf, count);
     make_distence(&control->chain, control->list);
+    pose_calculation(control->list, &control->pose);
 
     return 0;
 }
@@ -213,7 +228,7 @@ int     make_move(int wheelone, int wheeltwo, int wheelthree, int wheelfour, cha
     unsigned char buf[512] = { 0 };
 
     xassert(out_buf);
-    xassert(len > 8);
+    xassert(len > SHANG2MOTIONPACK);
 
     buf[0] = 0xA5;
     buf[1] = 0x5A;
@@ -226,6 +241,6 @@ int     make_move(int wheelone, int wheeltwo, int wheelthree, int wheelfour, cha
     buf[6] = 0xD5;
     buf[7] = 0x5D;
 
-    xmemcpy(out_buf, (char *)buf, 8);
-    return 8;
+    xmemcpy(out_buf, (char *)buf, SHANG2MOTIONPACK);
+    return SHANG2MOTIONPACK;
 }

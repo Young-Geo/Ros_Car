@@ -43,7 +43,7 @@ int  make_imu(imu_t *imu)
 
     for (start = imu->lists; start && start->next; start = start->next)
     {
-        buf = (char *)start->value;
+        //buf = (char *)start->value;
         if (!(buf = (char *)start->value))
             continue;
 
@@ -92,8 +92,7 @@ int  make_imu(imu_t *imu)
             break;
         }
     }
-
-
+    xlist_reset(imu->lists);
     tmpu->timestamp = xgetminsecond();
 
 }

@@ -205,6 +205,7 @@ SET(SOURCE_FILES
  src/control.cpp
  src/node_control.cpp
  src/imu.cpp
+ src/pose.cpp
 ) 
 SET(BASIS 
  ../basis/afx.cpp 
