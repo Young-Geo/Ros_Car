@@ -7,8 +7,17 @@
 #ifndef __POSE_H__
 #define __POSE_H__
 
+#include <ros/ros.h>
+#include <tf/transform_broadcaster.h>
+#include <nav_msgs/Odometry.h>
+#include <geometry_msgs/Twist.h>
+#include <nav_msgs/Odometry.h>
+#include <tf/transform_listener.h>
+#include <tf/tf.h>
+
 #include "global.h"
 #include "xlist.h"
+
 
 typedef struct _add_t
 {
@@ -23,7 +32,7 @@ typedef struct _motion_t
 
 typedef struct _pose_t
 {
-    int x,y,z;//tf
+    double x,y,z;//tf
     double w_x, w_y, w_z;
     xlist *add_list;
     motion_t motion;
@@ -31,7 +40,7 @@ typedef struct _pose_t
 
 void    pose_init(pose_t *pose);
 
-int     pose_calculation(xlist *list, pose_t *pose);
+int     pose_calculation(ros::Publisher &pub, xlist *list, pose_t *pose);
 
 int     motion_calculation(int *buf, motion_t *motion);
 

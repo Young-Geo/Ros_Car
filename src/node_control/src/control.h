@@ -8,6 +8,9 @@
 #ifndef __MOTION_H__
 #define __MOTION_H__
 
+
+#include <ros/ros.h>
+
 #include "afx.h"
 #include "xserial.h"
 #include "xlog.h"
@@ -37,7 +40,7 @@ typedef struct _control_t
 control_t *     control_init();
 int     control_destory(control_t *control);
 
-int     control_data_processing(control_t *control);
+int     control_data_processing(control_t *control, ros::Publisher &pub);
 
 int     move(control_t *control, int wheelone, int wheeltwo, int wheelthree, int wheelfour);
 

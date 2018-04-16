@@ -12,21 +12,25 @@
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
+#include <nav_msgs/Odometry.h>
 
 
 #include "control.h"
 #include "imu.h"
 #include "Ytimmer.h"
 
-#include "imu/Navigation.h"
-
+typedef struct _pub_t
+{
+    ros::Publisher odom_pub;
+} pub_t;
 
 typedef struct _control_imu_t
 {
    control_t *control;
    imu_t *imu;
    timmer_t *timmer;
-   NAV_T nav;
+   //NAV_T nav;
+   pub_t pub;
 } control_imu_t;
 
 

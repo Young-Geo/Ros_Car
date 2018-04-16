@@ -109,16 +109,14 @@ int     node_control_main(ros::NodeHandle &n)
 {
     //
     ros::Subscriber subclient;
-    ros::Publisher odom_pub;
     ros::Subscriber vel_sub;
     tf::TransformBroadcaster br;
     ros::Rate r(1.0);
 
     xassert((control_imu.control = control_init()));
     xassert((control_imu.imu = imu_init()));
-    //NavInit(&control_imu.nav);
 
-    odom_pub = n.advertise<nav_msgs::Odometry>("odom", 20);
+    control_imu.pub.odom_pub = n.advertise<nav_msgs::Odometry>("odom", 20);
     vel_sub = n.subscribe("cmd_vel", 20, vel_callback); //订阅/cmd_vel主题
 
     auto atimer_callback = [=, &control_imu](const ros::TimerEvent& event) -> void
@@ -144,11 +142,12 @@ int     node_control_main(ros::NodeHandle &n)
             return;
         }
 
-        control_data_processing(control_imu.control);
+        control_data_processing(control_imu.control, control_imu.pub.odom_pub);
+
     };
 
 
-    ros::Timer timer = n.createTimer(ros::Duration(5), atimer_callback);
+    ros::Timer timer = n.createTimer(ros::Duration(0.5), atimer_callback);
 
 
     signal(SIGINT, Stop);
@@ -159,7 +158,6 @@ int     node_control_main(ros::NodeHandle &n)
     while (ros::ok())
     {
         ROS_INFO("motion ...\n");
-        //timmer_spinOnce(control_imu.timmer);
         ros::spinOnce();
 
         r.sleep();

@@ -82,7 +82,7 @@ int     make_distence(xchain *chain, xlist *list)
     return 0;
 }
 
-int     control_data_processing(control_t *control)
+int     control_data_processing(control_t *control, ros::Publisher &pub)
 {
     unsigned char buf[1024] = { 0 };
     int i = 0, count = 0;
@@ -103,7 +103,7 @@ int     control_data_processing(control_t *control)
 
     xchain_add(&control->chain, (void *)buf, count);
     make_distence(&control->chain, control->list);
-    pose_calculation(control->list, &control->pose);
+    pose_calculation(pub, control->list, &control->pose);
 
     return 0;
 }
