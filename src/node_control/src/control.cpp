@@ -14,13 +14,17 @@ control_t *     control_init()
     xassert((control->list = xlist_init()));
 
     xchain_init(&control->chain);
+    pose_init(&control->pose);
 
 
     control->fd = fd;
 
     control->isStart = 1;
+    //error
 
     return control;
+err:
+    return NULL;
 }
 
 
@@ -34,6 +38,7 @@ int     control_destory(control_t *control)
 
     xlist_clean(&control->list);
     xchain_clear(&control->chain);
+    pose_destory(&control->pose);
 }
 
 

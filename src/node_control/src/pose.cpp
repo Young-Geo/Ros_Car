@@ -7,11 +7,33 @@
 
 #include "pose.h"
 
+void    pose_init(pose_t *pose)
+{
+    xassert(pose);
+    xzero(pose, sizeof(pose_t));
+    xassert(pose->add_list = xlist_init());
+}
+
+int     calculatexyz(pose_t *pose, add_t *add)
+{
+    xassert(pose);
+    xassert(add);
+    xassert(pose->add_list);
+
+    pose->x += add->x;
+    pose->y += add->y;
+    pose->w_z += add->w_z;
+
+    xlist_add(pose->add_list, NULL, XLIST_STRING, (char *)xmemdup((void *)add, sizeof(add_t)));
+
+    return 0;
+}
 
 int     pose_calculation(xlist *list, pose_t *pose)
 {
     int *buf = { 0 };
     xlist *start = NULL;
+    add_t add;
 
     xassert(list);
     xassert(pose);
@@ -23,9 +45,11 @@ int     pose_calculation(xlist *list, pose_t *pose)
             continue;
 
         motion_calculation(buf, &pose->motion);
-        pose->x = pose->motion.x * MOTIONTIMER;
-        pose->y = pose->motion.y * MOTIONTIMER;
-        pose->w_z = pose->motion.w_z * MOTIONTIMER;
+
+        add.x = pose->motion.x * MOTIONTIMER;
+        add.y = pose->motion.y * MOTIONTIMER;
+        add.w_z = pose->motion.w_z * MOTIONTIMER;
+        calculatexyz(pose, &add);
     }
 
     xlist_reset(list);
@@ -49,4 +73,14 @@ int     motion_calculation(int *buf, motion_t *motion)
 
 
     return 0;
+}
+
+
+
+void    pose_destory(pose_t *pose)
+{
+    xassert(pose);
+
+    if (pose->add_list)
+        xlist_clean(&pose->add_list);
 }

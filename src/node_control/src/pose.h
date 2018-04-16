@@ -10,6 +10,11 @@
 #include "global.h"
 #include "xlist.h"
 
+typedef struct _add_t
+{
+    int x, y, w_z;
+} add_t __attribute__((packed));
+
 typedef struct _motion_t
 {
     double one, two, three, four;
@@ -19,14 +24,18 @@ typedef struct _motion_t
 typedef struct _pose_t
 {
     int x,y,z;//tf
-    int w_x, w_y, w_z;
+    double w_x, w_y, w_z;
+    xlist *add_list;
     motion_t motion;
 } pose_t __attribute__((packed));
 
+void    pose_init(pose_t *pose);
 
 int     pose_calculation(xlist *list, pose_t *pose);
+
 int     motion_calculation(int *buf, motion_t *motion);
 
+void    pose_destory(pose_t *pose);
 
 
 
