@@ -21,7 +21,7 @@
 
 typedef struct _add_t
 {
-    int x, y, w_z;
+    double x, y, w_z;
 } add_t __attribute__((packed));
 
 typedef struct _motion_t

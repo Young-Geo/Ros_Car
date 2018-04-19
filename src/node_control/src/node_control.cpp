@@ -77,31 +77,40 @@ void vel_callback(const geometry_msgs::Twist::ConstPtr & input)//订阅/cmd_vel�
         angular_z  = 100;
         */
     if (linear_x == 0.0 && linear_y == 0.0 && angular_z == 0.0) {
+        static int is = 1;
        char buf[1024] = { 0 };
-        buf[0] = 0x4B;
-        buf[1] = 0x52;
-        buf[2] = 50;
-        buf[3] = 50;
-        buf[4] = 50;
-        buf[5] = 50;
-        buf[6] = 0x0D;
-        buf[7] = 0x0A;
+       if (is) {
+            buf[0] = 0xA5;
+            buf[1] = 0x5A;
+            buf[2] = 10;
+            buf[3] = 10;
+            buf[4] = 10;
+            buf[5] = 10;
+            buf[6] = 0xD5;
+            buf[7] = 0x5D;
+            is = 0;
+       } else {
+           buf[0] = 0xA5;
+           buf[1] = 0x5A;
+           buf[2] = 0;
+           buf[3] = 0;
+           buf[4] = 0;
+           buf[5] = 0;
+           buf[6] = 0xD5;
+           buf[7] = 0x5D;
+           is = 0;
+       }
         xmessage("shou dong \n");
-        for (int i = 0; i < 8; ++i)
-        {
-           printf("d %d, hex %x\t", buf[i], buf[i]);
-        }
-        printf("\n");
         xserial_send(control_imu.control->fd, (char *)buf, 8);
         return ;
     }
-
+/*
     xmessage("control linear_x %lf, linear_y %lf, angular_z %lf\n", linear_x, linear_y, angular_z);
 
 
     if (movexyz(control_imu.control, linear_x, linear_y, angular_z)) {
         xerror("control  movexyz not chenggong\n");
-    }
+    }*/
 
 }
 
@@ -111,10 +120,10 @@ int     node_control_main(ros::NodeHandle &n)
     ros::Subscriber subclient;
     ros::Subscriber vel_sub;
     tf::TransformBroadcaster br;
-    ros::Rate r(1.0);
+    ros::Rate r(5);
 
     xassert((control_imu.control = control_init()));
-    xassert((control_imu.imu = imu_init()));
+   // xassert((control_imu.imu = imu_init()));
 
     control_imu.pub.odom_pub = n.advertise<nav_msgs::Odometry>("odom", 20);
     vel_sub = n.subscribe("cmd_vel", 20, vel_callback); //订阅/cmd_vel主题
@@ -147,7 +156,7 @@ int     node_control_main(ros::NodeHandle &n)
     };
 
 
-    ros::Timer timer = n.createTimer(ros::Duration(0.5), atimer_callback);
+    //ros::Timer timer = n.createTimer(ros::Duration(0.5), atimer_callback);
 
 
     signal(SIGINT, Stop);
@@ -159,6 +168,10 @@ int     node_control_main(ros::NodeHandle &n)
     {
         ROS_INFO("motion ...\n");
         ros::spinOnce();
+
+        if (control_imu.control->isStart) {
+            control_data_processing(control_imu.control, control_imu.pub.odom_pub);
+        }
 
         r.sleep();
     }

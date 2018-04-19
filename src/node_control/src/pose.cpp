@@ -53,6 +53,7 @@ int     pose_calculation(ros::Publisher &pub, xlist *list, pose_t *pose)
         add.y = pose->motion.y * MOTIONTIMER;
         add.w_z = pose->motion.w_z * MOTIONTIMER;
         calculatexyz(pose, &add);
+        xmessage("motion vx %lf, vy %lf, vz %lf, sum: x %lf, y %lf, th %lf\n", pose->motion.x, pose->motion.y, pose->motion.w_z, pose->x, pose->y, pose->w_z);
         pubdata(pose, pub);
     }
 

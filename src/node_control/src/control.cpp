@@ -59,6 +59,7 @@ int     make_distence(xchain *chain, xlist *list)
             continue;
 
         xchain_get(chain, (void *)buf, MOTION2SHANGPACK);
+        xchain_delete(chain, MOTION2SHANGPACK);
         if (!(0xD5 == buf[0] && 0X5D ==buf[1] && 0xA5 == buf[10] && 0x5A == buf[11]))
             continue;
 
@@ -94,16 +95,13 @@ int     control_data_processing(control_t *control, ros::Publisher &pub)
         xmessage("control not data\n");
         return -1;
     }
-    xmessage("rec %d buf %s\nhex:", count, (char *)buf);
-    for (i = 0; i < count; ++i)
-    {
-        printf("%x %d ==\t", 0xff & buf[i], buf[i]);
-    }
-    xmessage("\n");
+    xmessage("rec %d \n", count);
 
     xchain_add(&control->chain, (void *)buf, count);
     make_distence(&control->chain, control->list);
+    xmessage("a %d \n", count);
     pose_calculation(pub, control->list, &control->pose);
+    xmessage("b %d \n", count);
 
     return 0;
 }

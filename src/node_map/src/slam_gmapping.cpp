@@ -596,6 +596,7 @@ SlamGMapping::addScan(const sensor_msgs::LaserScan& scan, GMapping::OrientedPoin
 void
 SlamGMapping::laserCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
+  printf("OK rec laser data\n");
   laser_count_++;
   if ((laser_count_ % throttle_scans_) != 0)
     return;
