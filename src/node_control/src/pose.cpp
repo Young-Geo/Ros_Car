@@ -139,5 +139,11 @@ int     pubdata(pose_t *pose, ros::Publisher &odom_pub)
 
     //publish the message
     odom_pub.publish(odom);
+
+
+    tf.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
+    tf.setRotation(tf::Quaternion(0, 0, 0, 1));
+    br.sendTransform(tf::StampedTransform(tf, cur, "odom", "map"));
+
     return 0;
 }
