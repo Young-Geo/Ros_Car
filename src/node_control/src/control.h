@@ -26,6 +26,9 @@
 #define MOTION2SHANGPACK 12
 #define SHANG2MOTIONPACK 8
 
+#define ZHENG 1
+#define FU 2
+
 
 typedef struct _control_t
 {

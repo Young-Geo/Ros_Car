@@ -69,14 +69,23 @@ int     make_distence(xchain *chain, xlist *list)
         four = buf[5];
 
         onef = buf[6];
+        if (onef == FU)
+            onef = -1;
         twof = buf[7];
+        if (twof == FU)
+            twof = -1;
         threef = buf[8];
+        if (threef == FU)
+            threef = -1;
         fourf = buf[9];
+        if (fourf == FU)
+            fourf = -1;
 
         tbuf[0] = one * onef;
         tbuf[1] = two * twof;
         tbuf[2] = three * threef;
         tbuf[3] = four * fourf;
+        xmessage("one %d, two %d, three %d, four %d, f1 %d, f2 %d, f3 %d, f4 %d\n", one, two, three, four, onef, twof, threef, fourf);
 
         xlist_add(list, NULL, XLIST_STRING, (char *)xmemdup((void *)tbuf, sizeof(tbuf)));
     }

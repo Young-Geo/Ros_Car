@@ -9,6 +9,7 @@
 
 static     motion_t motion;
 
+/*
 void		motion_call_back(const node_motion::motion::ConstPtr &motionmsg)
 {
     if (!motion.isStart) {
@@ -16,7 +17,7 @@ void		motion_call_back(const node_motion::motion::ConstPtr &motionmsg)
         return ;
     }
     movexyz(&motion, motionmsg->x, motionmsg->y, motionmsg->z);
-}
+}*/
 
 int     node_motion_main(ros::NodeHandle &n)
 {
@@ -30,7 +31,7 @@ int     node_motion_main(ros::NodeHandle &n)
 
     xassert(0 == motion_init(&motion));
 
-    subclient = n.subscribe<node_motion::motion>("motion", 1000, motion_call_back);
+    //subclient = n.subscribe<node_motion::motion>("motion", 1000, motion_call_back);
     odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
 
     double x = 0.0;

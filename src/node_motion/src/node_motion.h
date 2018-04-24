@@ -15,7 +15,7 @@
 
 #include "motion.h"
 
-#include "../../devel/include/node_motion/motion.h"
+//#include "../../devel/include/node_motion/motion.h"
 
 
 int     node_motion_main(ros::NodeHandle &n);

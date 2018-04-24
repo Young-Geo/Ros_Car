@@ -98,7 +98,7 @@ void vel_callback(const geometry_msgs::Twist::ConstPtr & input)//订阅/cmd_vel�
            buf[5] = 0;
            buf[6] = 0xD5;
            buf[7] = 0x5D;
-           is = 0;
+           is = 1;
        }
         xmessage("shou dong \n");
         xserial_send(control_imu.control->fd, (char *)buf, 8);
@@ -156,26 +156,21 @@ int     node_control_main(ros::NodeHandle &n)
     };
 
 
-    //ros::Timer timer = n.createTimer(ros::Duration(0.5), atimer_callback);
+    ros::Timer timer = n.createTimer(ros::Duration(0.5), atimer_callback);
 
 
     signal(SIGINT, Stop);
     signal(SIGTERM, Stop);
+    ros::spin();
 
-
-
+/*
     while (ros::ok())
     {
         ROS_INFO("motion ...\n");
         ros::spinOnce();
-
-        if (control_imu.control->isStart) {
-            control_data_processing(control_imu.control, control_imu.pub.odom_pub);
-        }
-
         r.sleep();
     }
-
+*/
     control_destory(control_imu.control);
     //imu_destory(control_imu.imu);
     return 0;
