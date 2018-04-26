@@ -8,8 +8,81 @@
 #include <ros/ros.h>
 #include "node_test01.h"
 #include "std_msgs/String.h"
+#include <sensor_msgs/LaserScan.h>
 
 #include <sstream>
+
+
+void pu(ros::Publisher &odom_pub, ros::Publisher &scan_pub)
+{
+    ros::Time cur;
+    geometry_msgs::Quaternion odom_quat;
+    tf::TransformBroadcaster br, brfream;
+    tf::Transform tf, tffream;
+    nav_msgs::Odometry odom;
+    geometry_msgs::TransformStamped odom_trans;
+    sensor_msgs::LaserScan scan_msg;
+
+    static double z = 0.1;
+    z += 0.1;
+
+
+
+
+    cur = ros::Time::now();
+
+    odom_quat = tf::createQuaternionMsgFromYaw(z);
+
+    odom_trans.header.stamp = cur;
+    odom_trans.header.frame_id = "odom";
+    odom_trans.child_frame_id = "base_link";
+
+    odom_trans.transform.translation.x = 0.0;
+    odom_trans.transform.translation.y = 0.0;
+    odom_trans.transform.translation.z = z;
+    odom_trans.transform.rotation = odom_quat;
+
+
+//    tf.setOrigin(tf::Vector3(0.0, 0.0, 0.0));//re
+//    tf.setRotation(odom_quat);
+
+    //send the transform
+    br.sendTransform(odom_trans);
+
+    odom.header.stamp = cur;
+    odom.header.frame_id = "odom";
+
+    //set the position
+    odom.pose.pose.position.x = 0.1;
+    odom.pose.pose.position.y = 0.1;
+    odom.pose.pose.position.z = z;
+    odom.pose.pose.orientation = odom_quat;
+
+    //set the velocity
+    odom.child_frame_id = "base_link";
+    odom.twist.twist.linear.x = 0.1;
+    odom.twist.twist.linear.y = 0.1;
+    odom.twist.twist.angular.z = z;
+
+    scan_msg.header.stamp = cur;
+    scan_msg.header.frame_id = "laser_frame";
+
+    //publish the message
+    odom_pub.publish(odom);
+    scan_pub.publish(scan_msg);
+    printf("push\n");
+
+
+    tf.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
+    tf.setRotation(tf::Quaternion(0, 0, 0, 1));
+    br.sendTransform(tf::StampedTransform(tf, cur, "map", "odom"));
+
+
+
+    tffream.setOrigin(tf::Vector3(0.0, 0.0, 8.0));
+    tffream.setRotation(tf::Quaternion(0, 0, 0, 1));
+    brfream.sendTransform(tf::StampedTransform(tf, cur, "base_link", "laser_frame"));
+}
 
 int main(int argc, const char **argv)
 {
@@ -17,30 +90,17 @@ int main(int argc, const char **argv)
 
     ros::NodeHandle n;
 
-    //node_test01_main(n);
-
-    ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
+    ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 20);
+    ros::Publisher scan_pub = n.advertise<sensor_msgs::LaserScan>("scan", 20);
 
     ros::Rate loop_rate(10);
 
-    int count = 0;
     while (ros::ok())
     {
-
-      std_msgs::String msg;
-
-      std::stringstream ss;
-      ss << "hello world " << count;
-      msg.data = ss.str();
-
-      ROS_INFO("%s", msg.data.c_str());
-
-      chatter_pub.publish(msg);
-
       ros::spinOnce();
-
+      pu(odom_pub, scan_pub);
+      printf("publist\n");
       loop_rate.sleep();
-      ++count;
     }
     return 0;
 }

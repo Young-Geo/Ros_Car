@@ -93,8 +93,8 @@ int     pubdata(pose_t *pose, ros::Publisher &odom_pub)
 {
     ros::Time cur;
     geometry_msgs::Quaternion odom_quat;
-    tf::TransformBroadcaster br, brfream;
-    tf::Transform tf, tffream;
+    tf::TransformBroadcaster br;
+    tf::Transform tf;
     nav_msgs::Odometry odom;
     geometry_msgs::TransformStamped odom_trans;
 
@@ -144,12 +144,6 @@ int     pubdata(pose_t *pose, ros::Publisher &odom_pub)
     tf.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
     tf.setRotation(tf::Quaternion(0, 0, 0, 1));
     br.sendTransform(tf::StampedTransform(tf, cur, "map", "odom"));
-
-
-
-    tffream.setOrigin(tf::Vector3(0.0, 0.0, 8.0));
-    tffream.setRotation(tf::Quaternion(0, 0, 0, 1));
-    brfream.sendTransform(tf::StampedTransform(tf, cur, "base_link", "laser_frame"));
 
     return 0;
 }

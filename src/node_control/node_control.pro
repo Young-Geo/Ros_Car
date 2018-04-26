@@ -7,7 +7,7 @@ INCLUDEPATH += ../basis
 INCLUDEPATH += /opt/ros/kinetic/include
 
 
-TARGET = Node_Motion
+TARGET = Node_Control
 
 SOURCES += \
     src/main.cpp \
