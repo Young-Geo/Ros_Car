@@ -33,6 +33,8 @@ void       client_socket_init(CSocket_t *socket)
 
     xchain_init(&socket->chain);
 
+    xmessage("client_socket_init access listen fd %d\n", fd);
+
     socket->fd = fd;
 }
 
@@ -52,6 +54,7 @@ int        client_socket_setback(CSocket_t *socket, call_back_t back)
     xassert(back);
 
     socket->back = back;
+    xmessage("client_socket_setback access \n");
     return 0;
 }
 
@@ -59,6 +62,7 @@ int        client_socket_setback(CSocket_t *socket, call_back_t back)
 static int client_socket_accept(CSocket_t *socket)
 {
     int cfd = 0;
+    char buf[1024] = { 0 };
 
     xassert(socket);
 
@@ -67,12 +71,15 @@ static int client_socket_accept(CSocket_t *socket)
         return -1;
     }
 
-    if ((cfd = xsk_accept(socket->fd, NULL)) <= 0) {
-        xerror("client_socket_spinOnce xsk_accept fd %d\n", cfd);
+    xmessage("accept connect ...\n");
+
+    if ((cfd = xsk_accept(socket->fd, buf)) <= 0) {
+        xerror("client_socket_spinOnce xsk_accept fd %d %s\n", cfd, buf);
         return -1;
     }
 
     socket->cfd = cfd;
+    xmessage("accept %d access %s\n", cfd, buf);
 
     return 0;
 }
@@ -83,11 +90,19 @@ int        client_socket_spinOnce(CSocket_t *socket)
     int reccount = 0;
 
     xassert(socket);
+    xmessage("client_socket_spinOnce ...\n");
 
     if ((socket->cfd <= 0) && client_socket_accept(socket)) {
         xdebug("client_socket_spinOnce cfd <= 0\n");
         return -1;
     }
+
+    /*
+    if (socket->cfd <= 0 && socket->fd > 0) {
+        client_socket_accept(socket);
+        return 2;
+    }*/
+
 
     if (!xsk_can_read(socket->cfd, 0, 0)) {
             xmessage("client_socket_spinOnce : cfd %d no can read\n", socket->cfd);
@@ -96,8 +111,17 @@ int        client_socket_spinOnce(CSocket_t *socket)
 
     //read data
 
+
+    /*
     if ((reccount = xsk_rcv(socket->cfd, buf, sizeof(buf), 0, 0)) <= 0) {
-        xerror("client_socket_spinOnce rec data size %d\n", reccount);
+        xsk_close(&socket->cfd);
+        xerror("client_socket_spinOnce  rec data size %d\n", reccount);
+        return -1;
+    }*/
+
+    if ((reccount = read(socket->cfd, (void *)buf, sizeof(buf))) <= 0) {
+        xsk_close(&socket->cfd);
+        xerror("client_socket_spinOnce  rec data size %d\n", reccount);
         return -1;
     }
 
@@ -108,13 +132,13 @@ int        client_socket_spinOnce(CSocket_t *socket)
         return -1;
     }
 
-
     while (1)
     {
         if (xchain_size(&socket->chain) < CLIENTPACKSIZE) {
             xdebug("client_socket_spinOnce xchain_size %d\n", xchain_size(&socket->chain));
             break;
         }
+
 
         if (!pkt_match_tag(&socket->chain, 0xA1)) {
             xerror("client_socket_spinOnce not find 0xA1\n");
@@ -124,8 +148,14 @@ int        client_socket_spinOnce(CSocket_t *socket)
         xchain_get(&socket->chain, (void *)buf, CLIENTPACKSIZE);
         xchain_delete(&socket->chain, CLIENTPACKSIZE);
 
-        if (buf[0] == 0xA1 && buf[1] == 0x1A && buf[6] == 0xD1 && buf[7] == 0x1D) {
-            /////
+        for (int i = 0; i < 8; ++i)
+        {
+            xmessage(" buf i %x \t", buf[i] & 0xff);
+        }
+        xmessage("\n");
+
+        if ((buf[0]&0xff) == 0xA1 && (buf[1]&0xff) == 0x1A && (buf[6]&0xff) == 0xD1 && (buf[7]&0xff) == 0x1D) {
+
             short angle = 0, distance = 0;
             angle = (buf[2] | ((buf[3] & 0xff) << 8));
             distance = (buf[4] | ((buf[5] & 0xff) << 8));

@@ -360,6 +360,7 @@ int xsk_rcv ( int sfd , char * data , int datasize , int flag , int timeout_mins
   
   while ( 1 )
   {
+      xmessage("xsk ...");
     len = XXMIN ( BUFFER_SIZE , datasize - recved ) ;
     
     if ( timeout_minsecond > 0 )
