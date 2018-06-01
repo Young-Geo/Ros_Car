@@ -6,7 +6,8 @@ SUBDIRS += \
     src/node_imu    \
     src/node_ladar  \
     src/node_control \
-    src/gmapping    \
+    src/slam_gmapping/gmapping    \
+    src/cartographer_ros
     src/node_test01 \
     src/node_test02
 

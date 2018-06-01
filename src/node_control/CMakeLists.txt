@@ -206,6 +206,7 @@ SET(SOURCE_FILES
  src/node_control.cpp
  src/imu.cpp
  src/pose.cpp
+ src/YClient.cpp
 ) 
 SET(BASIS 
  ../basis/afx.cpp 

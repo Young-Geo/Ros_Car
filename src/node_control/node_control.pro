@@ -21,7 +21,8 @@ SOURCES += \
     src/imu/Quaternion.cpp \
     src/imu/svdcmp.cpp \
     src/imu/Vector.cpp \
-    src/pose.cpp
+    src/pose.cpp \
+    src/YClient.cpp
 
 HEADERS += \
     src/node_control.h \
@@ -34,4 +35,5 @@ HEADERS += \
     src/imu/Quaternion.h \
     src/imu/svdcmp.h \
     src/imu/Vector.h \
-    src/pose.h
+    src/pose.h \
+    src/YClient.h

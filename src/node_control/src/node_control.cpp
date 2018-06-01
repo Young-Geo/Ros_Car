@@ -114,6 +114,11 @@ void vel_callback(const geometry_msgs::Twist::ConstPtr & input)//订阅/cmd_vel�
 
 }
 
+int clientControl(int fd, short angle, short distance)
+{
+    xmessage("fd %d, angle %d, distance %d\n", fd, angle, distance);
+}
+
 int     node_control_main(ros::NodeHandle &n)
 {
     //
@@ -124,6 +129,8 @@ int     node_control_main(ros::NodeHandle &n)
 
     xassert((control_imu.control = control_init()));
    // xassert((control_imu.imu = imu_init()));
+    client_socket_init(&control_imu.csocket);
+    client_socket_setback(&control_imu.csocket, clientControl);
 
     control_imu.pub.odom_pub = n.advertise<nav_msgs::Odometry>("odom", 20);
     vel_sub = n.subscribe("cmd_vel", 20, vel_callback); //订阅/cmd_vel主题
@@ -155,8 +162,14 @@ int     node_control_main(ros::NodeHandle &n)
 
     };
 
+    auto atimer_socketcallback = [=, &control_imu](const ros::TimerEvent& event) -> void
+    {
+        client_socket_spinOnce(&control_imu.csocket);
+    };
 
-    ros::Timer timer = n.createTimer(ros::Duration(0.5), atimer_callback);
+
+    n.createTimer(ros::Duration(0.5), atimer_callback);
+    n.createTimer(ros::Duration(0.1), atimer_socketcallback);
 
 
     signal(SIGINT, Stop);

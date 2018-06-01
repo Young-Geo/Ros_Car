@@ -18,6 +18,7 @@
 #include "control.h"
 #include "imu.h"
 #include "Ytimmer.h"
+#include "YClient.h"
 
 typedef struct _pub_t
 {
@@ -31,6 +32,7 @@ typedef struct _control_imu_t
    timmer_t *timmer;
    //NAV_T nav;
    pub_t pub;
+   CSocket_t csocket;
 } control_imu_t;
 
 
