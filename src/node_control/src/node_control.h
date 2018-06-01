@@ -14,6 +14,8 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 
+#include <math.h>
+
 
 #include "control.h"
 #include "imu.h"

@@ -115,16 +115,46 @@ int     control_data_processing(control_t *control, ros::Publisher &pub)
     return 0;
 }
 
+float maxLinearSpeed = 200 >> 1;
+float maxAngularSpeed = 200 >> 1;
+float minLinearSpeed = 30 >> 1;
+float minAngularSpeed = 30 >> 1;
+
+/*
+void mecanumRun(float xSpeed, float ySpeed, float aSpeed)
+{
+    float speed1 = ySpeed - xSpeed + aSpeed;
+    float speed2 = ySpeed + xSpeed - aSpeed;
+    float speed3 = ySpeed - xSpeed - aSpeed;
+    float speed4 = ySpeed + xSpeed + aSpeed;
+
+    float max = speed1;
+    if (max < speed2)   max = speed2;
+    if (max < speed3)   max = speed3;
+    if (max < speed4)   max = speed4;
+
+    if (max > maxLinearSpeed)
+    {
+        speed1 = speed1 / max * maxLinearSpeed;
+        speed2 = speed2 / max * maxLinearSpeed;
+        speed3 = speed3 / max * maxLinearSpeed;
+        speed4 = speed4 / max * maxLinearSpeed;
+    }
+
+    setEachMotorSpeed(speed1, speed2, speed3, speed4);
+}*/
+
 int     movexyz(control_t *control, double x, double y, double z)
 {
-    int one, two, three, four;
+/*
+    float speed1, speed2, speed3, speed4;
 
     xassert(control);
 
-    one = (int)(y - x + (z*A + z*B));
-    two = (int)(y + x - (z*A + z*B));
-    three = (int)(y - x - (z*A + z*B));
-    four = (int)(y + x + (z*A + z*B));
+    speed1 = (y - x + (z*A + z*B));
+    speed2 = (y + x - (z*A + z*B));
+    speed3 = (y - x - (z*A + z*B));
+    speed4 = (y + x + (z*A + z*B));
 
     if (one > 100)
         one = 100;
@@ -144,10 +174,33 @@ int     movexyz(control_t *control, double x, double y, double z)
     if (four > 100)
         four = 100;
     if (four < -100)
-        four = -100;
+        four = -100;*/
 
 
-    return move(control, one, two, three, four);
+    float speed1 = y - x + z;
+    float speed2 = y + x - z;
+    float speed3 = y - x - z;
+    float speed4 = y + x + z;
+
+    float max = speed1;
+
+    xassert(control);
+
+    if (max < speed2)   max = speed2;
+    if (max < speed3)   max = speed3;
+    if (max < speed4)   max = speed4;
+
+    if (max > maxLinearSpeed)
+    {
+        speed1 = speed1 / max * maxLinearSpeed;
+        speed2 = speed2 / max * maxLinearSpeed;
+        speed3 = speed3 / max * maxLinearSpeed;
+        speed4 = speed4 / max * maxLinearSpeed;
+    }
+
+
+
+    return move(control, speed1, speed2, speed3, speed4);
 
 }
 
@@ -157,6 +210,17 @@ int     move(control_t *control, int wheelone, int wheeltwo, int wheelthree, int
     char buf[1024] = { 0 };
     int ret = 0;
     xassert(control);
+
+    ret = wheeltwo;
+    wheeltwo = wheelthree;
+    wheelthree = ret;
+
+
+    ret = wheelthree;
+    wheelthree = wheelone;
+    wheelone = ret;
+
+
 
     if (control->fd <= 0) {
         xerror("motion fd error");

@@ -114,9 +114,70 @@ void vel_callback(const geometry_msgs::Twist::ConstPtr & input)//订阅/cmd_vel�
 
 }
 
+/*
 int clientControl(int fd, short angle, short distance)
 {
+    double x = 0.0, y = 0.0, z = 0.0;
+    char buf[1024] = { 0 };
+    static int is = 1;
     xmessage("fd %d, angle %d, distance %d\n", fd, angle, distance);
+    x = (distance*11) * cos(angle);
+    y = (distance*11) * sin(angle);
+    //xmessage("x %f, y %f, sin %f, cos %f", x*11, y * 11);
+    //movexyz(control_imu.control, x, y, z);
+    if (is) {
+         buf[0] = 0xA5;
+         buf[1] = 0x5A;
+         buf[2] = 10;
+         buf[3] = 10;
+         buf[4] = 10;
+         buf[5] = 10;
+         buf[6] = 0xD5;
+         buf[7] = 0x5D;
+         is = 0;
+    } else {
+        buf[0] = 0xA5;
+        buf[1] = 0x5A;
+        buf[2] = 0;
+        buf[3] = 0;
+        buf[4] = 0;
+        buf[5] = 0;
+        buf[6] = 0xD5;
+        buf[7] = 0x5D;
+        is = 1;
+    }
+     xmessage("shou dong \n");
+     xserial_send(control_imu.control->fd, (char *)buf, 8);
+}*/
+
+
+int clientControl(int fd, short angle, short distance)
+{
+
+    if ((0xff ==(angle & 0xff)) && 0xff == ((angle & 0xff00) >> 8)) {
+        xmessage("modle %d\n", distance);
+        switch (distance) {
+        case 0x01:
+            break;
+        case 0x02:
+            break;
+        case 0x03:
+            break;
+        case 0x04:
+            break;
+        default:
+            break;
+        }
+    } else {
+        double x = 0.0, y = 0.0, z = 0.0;
+        xmessage("fd %d, angle %d, distance %d\n", fd, angle, distance);
+        x = (distance*11) * cos(angle);
+        y = (distance*11) * sin(angle);
+        z = (PI / 180) * distance;
+        //xmessage("x %f, y %f, sin %f, cos %f", x*11, y * 11);
+        movexyz(control_imu.control, x, y, z);
+        //move(control_imu.control, 10, 10, 10, 10);
+    }
 }
 
 int     node_control_main(ros::NodeHandle &n)

@@ -157,8 +157,8 @@ int        client_socket_spinOnce(CSocket_t *socket)
         if ((buf[0]&0xff) == 0xA1 && (buf[1]&0xff) == 0x1A && (buf[6]&0xff) == 0xD1 && (buf[7]&0xff) == 0x1D) {
 
             short angle = 0, distance = 0;
-            angle = (buf[2] | ((buf[3] & 0xff) << 8));
-            distance = (buf[4] | ((buf[5] & 0xff) << 8));
+            angle = ((buf[2]&0xff) | ((buf[3] & 0xff) << 8));
+            distance = ((buf[4]&0xff) | ((buf[5] & 0xff) << 8));
             socket->back(socket->cfd, angle, distance);
         }
     }
