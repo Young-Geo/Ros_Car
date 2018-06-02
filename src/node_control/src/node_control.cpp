@@ -153,6 +153,7 @@ int clientControl(int fd, short angle, short distance)
 
 int clientControl(int fd, short angle, short distance)
 {
+    float linearSpeed = 50;
 
     if ((0xff ==(angle & 0xff)) && 0xff == ((angle & 0xff00) >> 8)) {
         xmessage("modle %d\n", distance);
@@ -162,10 +163,34 @@ int clientControl(int fd, short angle, short distance)
         case 0x02:
             break;
         case 0x03:
+            movexyz(control_imu.control, -linearSpeed, 0, 0);
             break;
         case 0x04:
+            movexyz(control_imu.control, linearSpeed, 0, 0);
+            break;
+        case 0x05:
+            movexyz(control_imu.control, 0, linearSpeed, 0);
+            break;
+        case 0x06:
+            movexyz(control_imu.control, 0, -linearSpeed, 0);
+            break;
+        case 0x07:
+            movexyz(control_imu.control, 0, 0, 0);
+            break;
+        case 0x08:
+            movexyz(control_imu.control, -linearSpeed/2, linearSpeed/2, 0);
+            break;
+        case 0x09:
+            movexyz(control_imu.control, -linearSpeed/2, -linearSpeed/2, 0);
+            break;
+        case 0x10:
+            movexyz(control_imu.control,  linearSpeed/2,  linearSpeed/2, 0);
+            break;
+        case 0x11:
+            movexyz(control_imu.control,  linearSpeed/2,  -linearSpeed/2, 0);
             break;
         default:
+            xmessage("com not find \n");
             break;
         }
     } else {
@@ -188,7 +213,7 @@ int     node_control_main(ros::NodeHandle &n)
     tf::TransformBroadcaster br;
     ros::Rate r(5);
 
-    //xassert((control_imu.control = control_init()));
+    xassert((control_imu.control = control_init()));
    // xassert((control_imu.imu = imu_init()));
     client_socket_init(&control_imu.csocket);
     client_socket_setback(&control_imu.csocket, clientControl);

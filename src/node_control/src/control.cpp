@@ -115,11 +115,6 @@ int     control_data_processing(control_t *control, ros::Publisher &pub)
     return 0;
 }
 
-float maxLinearSpeed = 200 >> 1;
-float maxAngularSpeed = 200 >> 1;
-float minLinearSpeed = 30 >> 1;
-float minAngularSpeed = 30 >> 1;
-
 /*
 void mecanumRun(float xSpeed, float ySpeed, float aSpeed)
 {
@@ -176,7 +171,7 @@ int     movexyz(control_t *control, double x, double y, double z)
     if (four < -100)
         four = -100;*/
 
-
+    float maxLinearSpeed = 70;
     float speed1 = y - x + z;
     float speed2 = y + x - z;
     float speed3 = y - x - z;
