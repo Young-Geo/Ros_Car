@@ -154,9 +154,11 @@ int clientControl(int fd, short angle, short distance)
 int clientControl(int fd, short angle, short distance)
 {
     float linearSpeed = 50;
+    float angularSpeed = 50;
+
 
     if ((0xff ==(angle & 0xff)) && 0xff == ((angle & 0xff00) >> 8)) {
-        xmessage("modle %d\n", distance);
+        xmessage("modle %x\n", distance);
         switch (distance) {
         case 0x01:
             break;
@@ -183,11 +185,17 @@ int clientControl(int fd, short angle, short distance)
         case 0x09:
             movexyz(control_imu.control, -linearSpeed/2, -linearSpeed/2, 0);
             break;
-        case 0x10:
+        case 0x0A:
             movexyz(control_imu.control,  linearSpeed/2,  linearSpeed/2, 0);
             break;
-        case 0x11:
+        case 0x0B:
             movexyz(control_imu.control,  linearSpeed/2,  -linearSpeed/2, 0);
+            break;
+        case 0x0C:
+            movexyz(control_imu.control,  0,  0, angularSpeed);
+            break;
+        case 0x0D:
+            movexyz(control_imu.control,  0,  0, -angularSpeed);
             break;
         default:
             xmessage("com not find \n");
@@ -195,6 +203,11 @@ int clientControl(int fd, short angle, short distance)
         }
     } else {
         double x = 0.0, y = 0.0, z = 0.0;
+        if (angle >= 0 && angle <= 359 - 90) {
+            angle += 90;
+        } else {
+            angle -= (359 - 90);
+        }
         xmessage("fd %d, angle %d, distance %d\n", fd, angle, distance);
         x = (distance*11) * cos(angle);
         y = (distance*11) * sin(angle);

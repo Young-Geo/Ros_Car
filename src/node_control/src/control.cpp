@@ -47,7 +47,7 @@ int     make_distence(xchain *chain, xlist *list)
     unsigned char buf[MOTION2SHANGPACK] = { 0 };
     int one = 0, two = 0, three = 0, four = 0;
     int onef = 0, twof = 0, threef = 0, fourf = 0;
-    int tbuf[4] = { 0 };
+    int tbuf[4] = { 0 }, t = 0;
 
     xassert(chain);
     xassert(list);
@@ -85,6 +85,16 @@ int     make_distence(xchain *chain, xlist *list)
         tbuf[1] = two * twof;
         tbuf[2] = three * threef;
         tbuf[3] = four * fourf;
+
+        t = tbuf[0];
+        tbuf[0] = tbuf[2];
+        tbuf[2] = t;
+
+        t = tbuf[1];
+        tbuf[1] = tbuf[2];
+        tbuf[2] = t;
+
+
         xmessage("one %d, two %d, three %d, four %d, f1 %d, f2 %d, f3 %d, f4 %d\n", one, two, three, four, onef, twof, threef, fourf);
 
         xlist_add(list, NULL, XLIST_STRING, (char *)xmemdup((void *)tbuf, sizeof(tbuf)));
